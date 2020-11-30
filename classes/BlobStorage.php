@@ -20,8 +20,8 @@
  * @link      https://github.com/azure/azure-storage-php
  */
 
-
-require_once "../vendor/autoload.php";
+global $CFG;
+require_once ($CFG->dirroot. '/mod/webgl/vendor/autoload.php');
 
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Blob\BlobSharedAccessSignatureHelper;
@@ -49,76 +49,81 @@ use MicrosoftAzure\Storage\Common\Models\ServiceProperties;
 $connectionString = 'DefaultEndpointsProtocol=https;AccountName=rswebgl;AccountKey=p9t5XgfvRhI5CR82wKu1584854B487fo+BRac1/WwInIU+BODd/it5CvXRLugSpG/yGVNuqbnkTwaRM01xTQpw==;EndpointSuffix=core.windows.net';
 $blobClient = BlobRestProxy::createBlobService($connectionString);
 
+function getConnection(){
+    $connectionString = 'DefaultEndpointsProtocol=https;AccountName=rswebgl;AccountKey=p9t5XgfvRhI5CR82wKu1584854B487fo+BRac1/WwInIU+BODd/it5CvXRLugSpG/yGVNuqbnkTwaRM01xTQpw==;EndpointSuffix=core.windows.net';
+    return BlobRestProxy::createBlobService($connectionString);
+}
+
 // A temporary container created and used through this sample, and finally deleted
-$myContainer = 'mycontainer' . generateRandomString();
-
-// Get and Set Blob Service Properties
-setBlobServiceProperties($blobClient);
-
-// To create a container call createContainer.
-createContainerSample($blobClient);
-
-// To get/set container properties
-containerProperties($blobClient);
-
-// To get/set container metadata
-containerMetadata($blobClient);
-
-// To get/set container ACL
-containerAcl($blobClient);
-
-// To upload a file as a blob, use the BlobRestProxy->createBlockBlob method. This operation will
-// create the blob if it doesn't exist, or overwrite it if it does. The code example below assumes
-// that the container has already been created and uses fopen to open the file as a stream.
-uploadBlobSample($blobClient);
-
-// To download blob into a file, use the BlobRestProxy->getBlob method. The example below assumes
-// the blob to download has been already created.
-downloadBlobSample($blobClient);
-
-//Generate a blob download link with a generated service level SAS token
-generateBlobDownloadLinkWithSAS();
-
-// To list the blobs in a container, use the BlobRestProxy->listBlobs method with a foreach loop to loop
-// through the result. The following code outputs the name and URI of each blob in a container.
-listBlobsSample($blobClient);
-
-// To get set blob properties
-blobProperties($blobClient);
-
-// To get set blob metadata
-blobMetadata($blobClient);
-
-// Basic operations for page blob.
-pageBlobOperations($blobClient);
-
-// Snap shot operation for blob service.
-snapshotOperations($blobClient);
-
-// Basic lease operations.
-leaseOperations($blobClient);
+//$myContainer = 'mycontainer' . generateRandomString();
+//
+//// Get and Set Blob Service Properties
+//setBlobServiceProperties($blobClient);
+//
+//// To create a container call createContainer.
+//createContainerSample($blobClient);
+//
+//// To get/set container properties
+//containerProperties($blobClient);
+//
+//// To get/set container metadata
+//containerMetadata($blobClient);
+//
+//// To get/set container ACL
+//containerAcl($blobClient);
+//
+//// To upload a file as a blob, use the BlobRestProxy->createBlockBlob method. This operation will
+//// create the blob if it doesn't exist, or overwrite it if it does. The code example below assumes
+//// that the container has already been created and uses fopen to open the file as a stream.
+//uploadBlobSample($blobClient);
+//
+//// To download blob into a file, use the BlobRestProxy->getBlob method. The example below assumes
+//// the blob to download has been already created.
+//downloadBlobSample($blobClient);
+//
+////Generate a blob download link with a generated service level SAS token
+//generateBlobDownloadLinkWithSAS();
+//
+//// To list the blobs in a container, use the BlobRestProxy->listBlobs method with a foreach loop to loop
+//// through the result. The following code outputs the name and URI of each blob in a container.
+//listBlobsSample($blobClient);
+//
+//// To get set blob properties
+//blobProperties($blobClient);
+//
+//// To get set blob metadata
+//blobMetadata($blobClient);
+//
+//// Basic operations for page blob.
+//pageBlobOperations($blobClient);
+//
+//// Snap shot operation for blob service.
+//snapshotOperations($blobClient);
+//
+//// Basic lease operations.
+//leaseOperations($blobClient);
 
 //Or to leverage the asynchronous methods provided, the operation can be done in
 //a promise pipeline.
-$containerName = '';
-try {
-    $containerName = basicStorageBlobOperationAsync($blobClient)->wait();
-} catch (ServiceException $e) {
-    $code = $e->getCode();
-    $error_message = $e->getMessage();
-    echo $code.": ".$error_message.PHP_EOL;
-} catch (InvalidArgumentTypeException $e) {
-    echo $e->getMessage().PHP_EOL;
-}
-
-try {
-    $blobClient->deleteContainerAsync($containerName)->wait();
-    cleanUp($blobClient);
-} catch (ServiceException $e) {
-    $code = $e->getCode();
-    $error_message = $e->getMessage();
-    echo $code.": ".$error_message.PHP_EOL;
-}
+//$containerName = '';
+//try {
+//    $containerName = basicStorageBlobOperationAsync($blobClient)->wait();
+//} catch (ServiceException $e) {
+//    $code = $e->getCode();
+//    $error_message = $e->getMessage();
+//    echo $code.": ".$error_message.PHP_EOL;
+//} catch (InvalidArgumentTypeException $e) {
+//    echo $e->getMessage().PHP_EOL;
+//}
+//
+//try {
+//    $blobClient->deleteContainerAsync($containerName)->wait();
+//    cleanUp($blobClient);
+//} catch (ServiceException $e) {
+//    $code = $e->getCode();
+//    $error_message = $e->getMessage();
+//    echo $code.": ".$error_message.PHP_EOL;
+//}
 
 function setBlobServiceProperties($blobClient)
 {
@@ -330,25 +335,12 @@ function blobMetadata($blobClient)
     $blobClient->deleteContainer($container);
 }
 
-function uploadBlobSample($blobClient)
+function uploadBlobSample($blob_name, $content)
 {
-    if (!file_exists("myfile.txt")) {
-        $file = fopen("myfile.txt", 'w');
-        fwrite($file, 'Hello World!');
-        fclose($file);
-    }
-
-    $content = fopen("myfile.txt", "r");
-    $blob_name = "myblob";
-
-    $content2 = "string content";
-    $blob_name2 = "myblob2";
-
+    $blobClient = getConnection();
     try {
         //Upload blob
-        global $myContainer;
-        $blobClient->createBlockBlob($myContainer, $blob_name, $content);
-        $blobClient->createBlockBlob($myContainer, $blob_name2, $content2);
+        $blobClient->createBlockBlob('webglcontent', $blob_name, $content);
     } catch (ServiceException $e) {
         $code = $e->getCode();
         $error_message = $e->getMessage();

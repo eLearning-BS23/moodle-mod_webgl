@@ -25,9 +25,10 @@
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/lib.php');
+require_once(dirname(__FILE__) . '/classes/BlobStorage.php');
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
 $n = optional_param('n', 0, PARAM_INT);  // ... webgl instance ID - it should be named as the first character of the module.
-$force_app_assign = optional_param('force_app_assign', 0, PARAM_INT);  // ... webgl instance ID - it should be named as the first character of the module.
+
 if ($id) {
     $cm = get_coursemodule_from_id('webgl', $id, 0, false, MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
@@ -63,6 +64,8 @@ echo $OUTPUT->header();
 if ($webgl->intro) {
     echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
 }
-
+?>
+    <iframe src="https://rswebgl.blob.core.windows.net/webglcontent/BoatTest_09/index.html" frameborder="0"></iframe>
+<?php
 
 echo $OUTPUT->footer();

@@ -1,6 +1,4 @@
 <?php
-//Copyright 2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
-//
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software; you can redistribute it and/or
@@ -25,6 +23,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+require_once 'locallib.php';
 
 /**
  * Returns the information on whether the module supports a feature
@@ -67,9 +66,10 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB;
 
     $webgl->timecreated = time();
+    print_r($mform);;
     $webgl->id = $DB->insert_record('webgl', $webgl);
 
-    webgl_grade_item_update($webgl);
+//    webgl_grade_item_update($webgl);
 
     return $webgl->id;
 }
@@ -102,13 +102,13 @@ function get_webgl_module(){
  * @return boolean Success/Fail
  */
 function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
-    global $DB;
-
+    global $DB,$USER;
+    $basefilename = $mform->get_new_filename('importfile');
+    $res = $mform->save_temp_file('importfile');
+    $modeldata = extract_import_contents($res);
+    // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;
-
-    // You may have to add extra stuff in here.
-
     $result = $DB->update_record('webgl', $webgl);
 
     webgl_grade_item_update($webgl);

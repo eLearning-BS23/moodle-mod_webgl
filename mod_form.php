@@ -38,7 +38,7 @@ class mod_webgl_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
-        $mform->addElement('filepicker', 'importfile', get_string('input:file', 'webgl'));
+        $mform->addElement('filepicker', 'importfile', get_string('input:file', 'webgl'),null, ['accepted_types' => '.zip']);
         $mform->addHelpButton('importfile', 'ziparchive', 'webgl');
         $mform->addRule('importfile', null, 'required');
         $this->standard_grading_coursemodule_elements();
