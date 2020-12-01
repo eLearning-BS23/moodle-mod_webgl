@@ -69,13 +69,11 @@ function webgl_supports($feature) {
  */
 function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB;
-
     $webgl->timecreated = time();
     $res = $mform->save_temp_file('importfile');
     $blobdatadetails = import_extract_upload_contents($res);
-    $webgl->index_file_url = $blobdatadetails[BS_WEBGL_INDEX];
+    $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
     $webgl->id = $DB->insert_record('webgl', $webgl);
-    webgl_grade_item_update($webgl);
     return $webgl->id;
 }
 
@@ -116,7 +114,7 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
     $webgl->id = $webgl->instance;
     $result = $DB->update_record('webgl', $webgl);
 
-    webgl_grade_item_update($webgl);
+//    webgl_grade_item_update($webgl);
 
     return $result;
 }
