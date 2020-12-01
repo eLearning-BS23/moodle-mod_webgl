@@ -32,12 +32,17 @@ $string['ziparchive_help'] = 'Select a zip file containing index.html, index.liq
 //BEGIN: Fields in the admin form//
 ///////////////////////////////////
 
-$string['account_name'] = 'Microsoft Azure Storage Account Name';
+$string['account_name'] = 'Azure Storage Account Name';
 $string['account_name_help'] = 'An Azure storage account contains all of your Azure Storage data objects: blobs, files, queues, tables, and disks. The storage account provides a unique namespace for your Azure Storage data that is accessible from anywhere in the world over HTTP or HTTPS. Data in your Azure storage account is durable and highly available, secure, and massively scalable.';
 
-$string['account_key'] = 'Microsoft Azure Storage Account Key';
+$string['account_key'] = 'Azure Storage Account Key';
 $string['account_key_help'] = 'When you create a storage account, Azure generates two 512-bit storage account access keys. These keys can be used to authorize access to data in your storage account via Shared Key authorization.';
 
+$string['container_name'] = 'Blob storage container';
+$string['container_name_help'] = 'Azure Blob Storage helps you create data lakes for your analytics needs, and provides storage to build powerful cloud-native and mobile apps. Optimize costs with tiered storage for your long-term data, and flexibly scale up for high-performance computing and machine learning workloads.';
+
+$string['storage'] = 'Storage details';
+$string['storage'] = 'Storage details';
 /////////////////////////////////
 //END: Fields in the admin form//
 /////////////////////////////////

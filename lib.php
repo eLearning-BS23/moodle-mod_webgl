@@ -23,6 +23,11 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+
+define('AZURE_BLOB_CONTAINER','webglcontent');
+define('BS_WEBGL_INDEX','bs_webgl_index');
+define('AZURE_BLOB_DEFAULT_CONTENT_TYPE','text/plain');
+
 require_once 'locallib.php';
 
 /**
@@ -103,9 +108,9 @@ function get_webgl_module(){
  */
 function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB,$USER;
-    $basefilename = $mform->get_new_filename('importfile');
+//    $basefilename = $mform->get_new_filename('importfile');
     $res = $mform->save_temp_file('importfile');
-    $modeldata = extract_import_contents($res);
+    $modeldata = import_extract_upload_contents($res);
     // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;

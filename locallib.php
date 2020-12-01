@@ -11,7 +11,9 @@
 
 require_once 'classes/BlobStorage.php';
 
-function extract_import_contents(string $zipfilepath) : array {
+
+
+function import_extract_upload_contents(string $zipfilepath) : array {
 
     $importtempdir = make_request_directory('webglcontentimport' . microtime(false));
 
@@ -29,13 +31,18 @@ function extract_import_contents(string $zipfilepath) : array {
         // Missing required file.
         throw new \moodle_exception('errorimport', 'mod_webgl');
     }
+    $blobClient = getConnection();
 
     foreach ($filelist as $filename => $value):
         $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
         if (!is_dir($cfile)){
-            $content = file_get_contents($cfile);
-            uploadBlobSample( $filename, $content);
+            $contetnttype = mime_content_type($cfile);
+            $content = fopen($cfile, "r");
+            uploadBlob( $blobClient, $filename, $content,$contetnttype, AZURE_BLOB_CONTAINER);
+            if(is_resource($content)) {
+                fclose($content);
+            }
         }
     endforeach;
-    die('At last');
+    return listBlobs($blobClient, AZURE_BLOB_CONTAINER);
 }

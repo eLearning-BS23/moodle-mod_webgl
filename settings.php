@@ -18,4 +18,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('webgl/AccountKey',
         get_string('account_key', 'mod_webgl'), get_string('account_key_help', 'mod_webgl'), '', PARAM_TEXT, 190));
 
+    $settings->add(new admin_setting_configtext('webgl/ContainerName',
+        get_string('container_name', 'mod_webgl'), get_string('container_name_help', 'mod_webgl'), '', PARAM_TEXT, 90));
+
 }

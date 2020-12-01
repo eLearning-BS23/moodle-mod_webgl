@@ -29,7 +29,7 @@ class mod_webgl_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        //$mform->addHelpButton('name', 'appstreamname', 'appstream');
+        //$mform->addHelpButton('name', 'appstreamname', 'webgl');
 
         // Adding the standard "intro" and "introformat" fields.
         if ($CFG->branch >= 29) {
@@ -41,6 +41,29 @@ class mod_webgl_mod_form extends moodleform_mod {
         $mform->addElement('filepicker', 'importfile', get_string('input:file', 'webgl'),null, ['accepted_types' => '.zip']);
         $mform->addHelpButton('importfile', 'ziparchive', 'webgl');
         $mform->addRule('importfile', null, 'required');
+
+        $mform->addElement('header', 'storage', get_string('storage', 'webgl'));
+
+        $mform->addElement('text', 'account_name', get_string('account_name', 'webgl'));
+        $mform->addHelpButton('account_name', 'account_name', 'webgl');
+        $mform->addRule('account_name', null, 'required', null, 'client');
+        $AccountName = get_config('webgl','AccountName');
+        $mform->setDefault('account_name',$AccountName);
+
+        $mform->addElement('text', 'account_key', get_string('account_key', 'webgl'));
+        $mform->addHelpButton('account_key', 'account_key', 'webgl');
+        $mform->addRule('account_key', null, 'required', null, 'client');
+        $AccountKey = get_config('webgl','AccountKey');
+        $mform->setDefault('account_key',$AccountKey);
+
+        $mform->addElement('text', 'container_name', get_string('container_name', 'webgl'));
+        $mform->addHelpButton('container_name', 'container_name', 'webgl');
+        $mform->addRule('container_name', null, 'required', null, 'client');
+        $ContainerName = get_config('webgl','ContainerName');
+        $mform->setDefault('container_name',$ContainerName);
+
+
+
         $this->standard_grading_coursemodule_elements();
 
         // Add standard elements, common to all modules.

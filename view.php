@@ -65,7 +65,7 @@ if ($webgl->intro) {
     echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
 }
 ?>
-    <iframe src="https://rswebgl.blob.core.windows.net/webglcontent/BoatTest_09/index.html" frameborder="0"></iframe>
+    <iframe width="100%" height="400px" src="https://rswebgl.blob.core.windows.net/webglcontent/BoatTest_09/index.html" frameborder="0"></iframe>
 <?php
 
 echo $OUTPUT->footer();
