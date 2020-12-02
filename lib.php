@@ -24,7 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-define('AZURE_BLOB_CONTAINER','webglcontent');
 define('BS_WEBGL_INDEX','bs_webgl_index');
 define('AZURE_BLOB_DEFAULT_CONTENT_TYPE','text/plain');
 
@@ -70,28 +69,14 @@ function webgl_supports($feature) {
 function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB;
     $webgl->timecreated = time();
-    $res = $mform->save_temp_file('importfile');
-    $blobdatadetails = import_extract_upload_contents($res);
-    $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
     $webgl->id = $DB->insert_record('webgl', $webgl);
+    $res = $mform->save_temp_file('importfile');
+    $blobdatadetails = import_extract_upload_contents($webgl, $res);
+    $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
+    $DB->update_record('webgl', $webgl);
     return $webgl->id;
 }
 
-/**
- * @return moodle_recordset
- * @throws dml_exception
- */
-function get_webgl_module(){
-    global $DB;
-    $webglsql = 'SELECT *
-                    FROM {course_modules} cm
-                    WHERE module in (
-	                    SELECT id FROM {modules} m where m.name = "webgl"
-                    )
-                    AND deletioninprogress = 0
-                    AND visible = 1';
-    return $DB->get_recordset_sql($webglsql);
-}
 
 /**
  * Updates an instance of the webgl in the database
@@ -106,15 +91,18 @@ function get_webgl_module(){
  */
 function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB,$USER;
-    $basefilename = $mform->get_new_filename('importfile');
-    $res = $mform->save_temp_file('importfile');
-    $modeldata = import_extract_upload_contents($res);
+
     // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;
-    $result = $DB->update_record('webgl', $webgl);
+    $basefilename = $mform->get_new_filename('importfile');
+    if ($basefilename){
+        $res = $mform->save_temp_file('importfile');
+        $blobdatadetails = import_extract_upload_contents($webgl, $res);
+        $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
+    }
 
-//    webgl_grade_item_update($webgl);
+    $result = $DB->update_record('webgl', $webgl);
 
     return $result;
 }
@@ -170,8 +158,8 @@ function webgl_delete_instance($id) {
     // Delete any dependent records here.
 
     $DB->delete_records('webgl', array('id' => $webgl->id));
-
-    webgl_grade_item_delete($webgl);
+    delete_container_blobs($webgl);
+//    webgl_grade_item_delete($webgl);
 
     return true;
 }

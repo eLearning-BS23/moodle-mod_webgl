@@ -13,6 +13,7 @@ $string['modulenameplural'] = 'WebGL';
 $string['modulename_help'] = 'WebGL is a JavaScript API for rendering interactive 2D and 3D graphics within any compatible web browser without the use of plug-ins. WebGL is fully integrated with other web standards, allowing GPU-accelerated usage of physics and image processing and effects as part of the web page canvas.';
 $string['contentheader'] = 'Content';
 $string['input:file'] = 'WebGL file';
+$string['header:content'] = 'WebGL content';
 //TODO: Find these strings in the UI and make sure they are logical
 $string['webgl:addinstance'] = 'Add a new WebGL Application.';
 $string['webgl:submit'] = 'Submit WebGL Application';
@@ -26,6 +27,9 @@ $string['pluginadministration'] = 'webgl administration';
 $string['pluginname'] = 'webgl';
 $string['ziparchive'] = 'Select a zip file.';
 $string['ziparchive_help'] = 'Select a zip file containing index.html, index.liquid, logo, .htaccess and build files and folders.';
+
+$string['content_advcheckbox'] = 'Update WebGL content too';
+$string['content_advcheckbox_help'] = 'If enabled,you can also update the WebGL content';
 
 
 ///////////////////////////////////

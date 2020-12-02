@@ -11,9 +11,22 @@
 
 require_once 'classes/BlobStorage.php';
 
+/**
+ * Make prefix webgl blob file name.
+ * @param stdClass $webgl
+ * @return string
+ */
+function cloudstoragewebglcontentprefix(stdClass $webgl){
+    return "course-$webgl->course"."-module-id-$webgl->id";
+}
 
-
-function import_extract_upload_contents(string $zipfilepath) : array {
+/**
+ * @param stdClass $webgl
+ * @param string $zipfilepath
+ * @return array
+ * @throws moodle_exception
+ */
+function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : array {
 
     $importtempdir = make_request_directory('webglcontentimport' . microtime(false));
 
@@ -25,24 +38,45 @@ function import_extract_upload_contents(string $zipfilepath) : array {
         throw new \moodle_exception('invalidcontent', 'mod_webgl');
     }
 
-    $indexfile = $dirname.'index.html';
+    $indexfile = $dirname . 'index.html';
 
-    if (!in_array($indexfile,$filelist)) {
+    if (!in_array($indexfile, $filelist)) {
         // Missing required file.
         throw new \moodle_exception('errorimport', 'mod_webgl');
     }
-    $blobClient = getConnection();
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
 
     foreach ($filelist as $filename => $value):
         $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
-        if (!is_dir($cfile)){
+        if (!is_dir($cfile)) {
+            $replacewith = cloudstoragewebglcontentprefix($webgl);
+            $filename = str_replace_first($filename, '/', $replacewith);
             $contetnttype = mime_content_type($cfile);
             $content = fopen($cfile, "r");
-            uploadBlob( $blobClient, $filename, $content,$contetnttype, AZURE_BLOB_CONTAINER);
-            if(is_resource($content)) {
+            uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
+            if (is_resource($content)) {
                 fclose($content);
             }
         }
     endforeach;
-    return listBlobs($blobClient, AZURE_BLOB_CONTAINER);
+    return listBlobs($blobClient, $webgl);
+}
+
+function delete_container_blobs(stdClass $webgl){
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+    deleteBlobs($blobClient, $webgl);
+}
+
+/**
+ * @param $haystack
+ * @param $needle
+ * @param $replace
+ * @return string|string[]
+ */
+function str_replace_first($haystack, $needle, $replace)
+{
+    $pos = strpos($haystack, $needle);
+    if ($pos !== false) {
+        return substr_replace($haystack, $replace, 0, $pos );
+    }
 }

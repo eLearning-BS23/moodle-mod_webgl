@@ -40,19 +40,20 @@ use MicrosoftAzure\Storage\Common\Models\Metrics;
 use MicrosoftAzure\Storage\Common\Models\RetentionPolicy;
 use MicrosoftAzure\Storage\Common\Models\ServiceProperties;
 
-function getConnection(){
-    $connectionString = 'DefaultEndpointsProtocol=https;AccountName=rswebgl;AccountKey=p9t5XgfvRhI5CR82wKu1584854B487fo+BRac1/WwInIU+BODd/it5CvXRLugSpG/yGVNuqbnkTwaRM01xTQpw==;EndpointSuffix=core.windows.net';
+function getConnection(string $AccountName,string $AccountKey){
+    $connectionString = "DefaultEndpointsProtocol=https;AccountName=$AccountName;AccountKey=$AccountKey;EndpointSuffix=core.windows.net";
     return BlobRestProxy::createBlobService($connectionString);
 }
 
 /**
- * @param $blobClient
+ * Create a new Blob
+ * @param BlobRestProxy $blobClient
  * @param $blob_name
  * @param $content
  * @param string $contetnttype
  * @param string $container
  */
-function uploadBlob($blobClient, $blob_name, $content, string $contetnttype , string $container)
+function uploadBlob(BlobRestProxy $blobClient, $blob_name, $content, string $contetnttype , string $container)
 {
     try {
         $blobClient->createBlockBlob($container, $blob_name, $content);
@@ -67,23 +68,25 @@ function uploadBlob($blobClient, $blob_name, $content, string $contetnttype , st
 }
 
 /**
- * @param $blobClient
- * @param string $container
+ * List Blobs of a container
+ * @param BlobRestProxy $blobClient
+ * @param stdClass $webgl
  * @return array
  */
-function listBlobs($blobClient, string $container)
+function listBlobs(BlobRestProxy $blobClient, stdClass $webgl)
 {
     $contentlist = array();
     try {
         // List blobs.
         $listBlobsOptions = new ListBlobsOptions();
-
+        $prefix = cloudstoragewebglcontentprefix($webgl);
+        $listBlobsOptions->setPrefix($prefix);
         // Setting max result to 1 is just to demonstrate the continuation token.
         // It is not the recommended value in a product environment.
         $listBlobsOptions->setMaxResults(1);
 
         do {
-            $blob_list = $blobClient->listBlobs($container, $listBlobsOptions);
+            $blob_list = $blobClient->listBlobs($webgl->container_name, $listBlobsOptions);
             foreach ($blob_list->getBlobs() as $blob) {
                 $contentlist[$blob->getName()] = $blob->getUrl();
                 if (strpos($blob->getName(), 'index.html') !== false){
@@ -102,3 +105,46 @@ function listBlobs($blobClient, string $container)
     return $contentlist;
 }
 
+/**
+ * Delete a Blob
+ * @param BlobRestProxy $blobClient
+ * @param stdClass $webgl
+ * @return void
+ */
+function deleteBlobs(BlobRestProxy $blobClient, stdClass $webgl){
+    try {
+        // List blobs.
+        $listBlobsOptions = new ListBlobsOptions();
+        $prefix = cloudstoragewebglcontentprefix($webgl);
+        $listBlobsOptions->setPrefix($prefix);
+
+        // Setting max result to 1 is just to demonstrate the continuation token.
+        // It is not the recommended value in a product environment.
+        $listBlobsOptions->setMaxResults(1);
+
+        do {
+            $blob_list = $blobClient->listBlobs($webgl->container_name, $listBlobsOptions);
+            foreach ($blob_list->getBlobs() as $blob) {
+                deleteBlob($blobClient,$webgl->container_name,$blob->getName());
+            }
+
+            $listBlobsOptions->setContinuationToken($blob_list->getContinuationToken());
+        } while ($blob_list->getContinuationToken());
+
+    } catch (ServiceException $e) {
+        $code = $e->getCode();
+        $error_message = $e->getMessage();
+        echo $code.": ".$error_message.PHP_EOL;
+    }
+}
+
+/**
+ * Delete a Blob
+ * @param BlobRestProxy $blobClient
+ * @param string $container
+ * @param string $blob_name
+ * @return void
+ */
+function deleteBlob(BlobRestProxy $blobClient, string $container, string $blob_name){
+    $blobClient->deleteBlob($container, $blob_name);
+}

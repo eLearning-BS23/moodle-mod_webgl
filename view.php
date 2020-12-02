@@ -64,6 +64,7 @@ echo $OUTPUT->header();
 if ($webgl->intro) {
     echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
 }
+
 ?>
     <iframe width="100%" height="400px" src="<?php echo $webgl->index_file_url;?>" frameborder="0"></iframe>
 <?php

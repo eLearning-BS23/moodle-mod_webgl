@@ -38,10 +38,24 @@ class mod_webgl_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
+        // WebGl contetn form portion goes here.
+        $mform->addElement('header', 'webglcontent', get_string('header:content', 'webgl'));
+
+
+
         $mform->addElement('filepicker', 'importfile', get_string('input:file', 'webgl'),null, ['accepted_types' => '.zip']);
         $mform->addHelpButton('importfile', 'ziparchive', 'webgl');
-        $mform->addRule('importfile', null, 'required');
 
+        $is_update_form = $this->optional_param('update',0,PARAM_INT);
+        if ($is_update_form > 0){
+            $mform->addElement('advcheckbox', 'update_webgl_content', get_string('content_advcheckbox','webgl'));
+            $mform->addHelpButton('update_webgl_content', 'content_advcheckbox','webgl');
+            $mform->disabledIf('importfile','update_webgl_content');
+        }else{
+            $mform->addRule('importfile', null, 'required');
+        }
+
+        // Storage form fields goes here.
         $mform->addElement('header', 'storage', get_string('storage', 'webgl'));
 
         $mform->addElement('text', 'account_name', get_string('account_name', 'webgl'));
@@ -75,4 +89,6 @@ class mod_webgl_mod_form extends moodleform_mod {
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
     }
+
+
 }
