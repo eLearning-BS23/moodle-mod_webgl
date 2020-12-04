@@ -1,6 +1,5 @@
-# Microsoft Azure Storage PHP Client Libraries
+# Microsoft Azure Storage WebGL content upload
 
-This project provides a set of PHP client libraries that make it easy to access Microsoft Azure Storage services (blobs, tables, queues and files). For documentation on how to host PHP applications on Microsoft Azure, please see the [Microsoft Azure PHP Developer Center](http://www.windowsazure.com/en-us/develop/php/).
 
 # Getting Started
 ## Minimum Requirements
@@ -21,15 +20,20 @@ This project provides a set of PHP client libraries that make it easy to access 
 To get the source code from GitHub, type
 
 ```
-git clone https://github.com/Azure/azure-storage-php.git webgl
-cd ./azure-storage-php
+git clone https://github.com/Azure/azure-storage-php.git
 ```
 
-## Install via Composer
+## Installation
+1. Go to Project root/mod directory 
+2. clone code by using following commands
+```
+git clone https://github.com/Azure/azure-storage-php.git webgl
+cd webgl
 
-2. Download **[composer.phar](http://getcomposer.org/composer.phar)** in your project root.
+```
+3. Download **[composer.phar](http://getcomposer.org/composer.phar)** in webgl directory.
 
-3. Open a command prompt and execute this in your project root
+4. Open a command prompt and execute following commands 
 
 ```
 php composer.phar install
