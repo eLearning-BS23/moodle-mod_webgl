@@ -21,9 +21,11 @@ function cloudstoragewebglcontentprefix(stdClass $webgl){
 }
 
 /**
+ * Extracts the imported zip contents.
+ * Push to Azure BLOB storage.
  * @param stdClass $webgl
  * @param string $zipfilepath
- * @return array
+ * @return array List of imported files.
  * @throws moodle_exception
  */
 function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : array {
