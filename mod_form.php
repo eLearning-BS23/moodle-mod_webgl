@@ -15,7 +15,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_webgl_mod_form extends moodleform_mod {
 
     public function definition() {
-        global $CFG;
+        global $CFG, $DB;
         $mform = $this->_form;
 
         //-------------------------------------------------------
@@ -41,12 +41,26 @@ class mod_webgl_mod_form extends moodleform_mod {
         // WebGl contetn form portion goes here.
         $mform->addElement('header', 'webglcontent', get_string('header:content', 'webgl'));
 
+        $is_update_form = $this->optional_param('update',0,PARAM_INT);
+
+        if ($is_update_form > 0) {
+            $dataforform = $DB->get_record('course_modules', array('id' => $is_update_form));
+            $moduledata = $DB->get_record('webgl', array('id' => $dataforform->instance));
+            $ancor = '<div id="fitem_id_webgl_file" class="form-group row  fitem">
+                        <div class="col-md-3">
+                            <label class="col-form-label d-inline " for="id_webgl_file">&nbsp;</label>
+                        </div>
+                        <div class="col-md-9 form-inline felement" data-fieldtype="text" id="id_webgl_file">
+                            <a target="_blank" href="/mod/webgl/download.php?id='.$is_update_form.'">Download '.$moduledata->webgl_file.'</a>
+                        </div>
+                    </div>';
+            $mform->addElement('html', $ancor);
+        }
 
 
         $mform->addElement('filepicker', 'importfile', get_string('input:file', 'webgl'),null, ['accepted_types' => '.zip']);
         $mform->addHelpButton('importfile', 'ziparchive', 'webgl');
 
-        $is_update_form = $this->optional_param('update',0,PARAM_INT);
         if ($is_update_form > 0){
             $mform->addElement('advcheckbox', 'update_webgl_content', get_string('content_advcheckbox','webgl'));
             $mform->addHelpButton('update_webgl_content', 'content_advcheckbox','webgl');

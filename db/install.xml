@@ -12,6 +12,7 @@
         <FIELD NAME="intro" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="General introduction of the webgl activity"/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
 
+        <FIELD NAME="webgl_file" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Uploaded WebGL File Name"/>
         <FIELD NAME="account_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Account Name"/>
         <FIELD NAME="account_key" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Account Key"/>
         <FIELD NAME="container_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Azure BLOB storage Container name"/>
