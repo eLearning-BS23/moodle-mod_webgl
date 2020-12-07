@@ -51,6 +51,4 @@ $PAGE->set_cacheable(false);
 $context = context_course::instance($course->id);
 
 echo $OUTPUT->header();
-
-
 echo $OUTPUT->footer();

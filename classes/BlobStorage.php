@@ -39,7 +39,6 @@ use MicrosoftAzure\Storage\Common\Models\Logging;
 use MicrosoftAzure\Storage\Common\Models\Metrics;
 use MicrosoftAzure\Storage\Common\Models\RetentionPolicy;
 use MicrosoftAzure\Storage\Common\Models\ServiceProperties;
-
 function getConnection(string $AccountName,string $AccountKey){
     $connectionString = "DefaultEndpointsProtocol=https;AccountName=$AccountName;AccountKey=$AccountKey;EndpointSuffix=core.windows.net";
     return BlobRestProxy::createBlobService($connectionString);
@@ -60,6 +59,64 @@ function uploadBlob(BlobRestProxy $blobClient, $blob_name, $content, string $con
         $opts = new SetBlobPropertiesOptions();
         $opts->setContentType($contetnttype);
         $blobClient->setBlobProperties($container, $blob_name, $opts);
+    } catch (ServiceException $e) {
+        $code = $e->getCode();
+        $error_message = $e->getMessage();
+        echo $code.": ".$error_message.PHP_EOL;
+    }
+}
+
+function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl,$cm){
+    global $USER;
+    $folder = rtrim($webgl->webgl_file,'.zip') ;
+//    mkdir(DIRECTORY_SEPARATOR.$folder);
+//    chmod(DIRECTORY_SEPARATOR.$folder, 0777);
+
+    $fs = get_file_storage();
+    $context = context_module::instance($cm->id);
+
+//    $fs->create_directory()
+    try {
+        // List blobs.
+        $listBlobsOptions = new ListBlobsOptions();
+        $prefix = cloudstoragewebglcontentprefix($webgl);
+        $listBlobsOptions->setPrefix($prefix);
+        // Setting max result to 1 is just to demonstrate the continuation token.
+        // It is not the recommended value in a product environment.
+        $listBlobsOptions->setMaxResults(1);
+        $count = 1;
+
+        do {
+            $count++;
+            $blob_list = $blobClient->listBlobs($webgl->container_name, $listBlobsOptions);
+            foreach ($blob_list->getBlobs() as $blob) {
+                $filearr = explode('/',$blob->getName());
+                var_dump($filearr);
+                for ($i=1;$i<count($filearr);$i++):
+                    var_dump(is_dir($filearr[$i]));
+                    var_dump($filearr[$i]);
+
+                endfor;
+                if ($count>3){
+                    die;
+                }
+//                $filerecord = new stdClass;
+//                $filerecord->contextid = $context->id;
+//                $filerecord->component = 'mod_webgl';
+//                $filerecord->filearea = 'content';
+//                $filerecord->itemid = 0;
+//                $filerecord->filepath = '/';
+//                $filerecord->userid = $USER->id;
+//
+//                $filerecord->filename = $blob->getName();
+//                $content = downloadBlobStreamContent($blobClient, $webgl->container_name, $blob->getName());
+//                $fs->create_file_from_string($filerecord,stream_get_contents($content));
+            }
+
+            $listBlobsOptions->setContinuationToken($blob_list->getContinuationToken());
+        } while ($blob_list->getContinuationToken());
+//        send_file($webgl->webgl_file)
+
     } catch (ServiceException $e) {
         $code = $e->getCode();
         $error_message = $e->getMessage();
@@ -147,4 +204,23 @@ function deleteBlobs(BlobRestProxy $blobClient, stdClass $webgl){
  */
 function deleteBlob(BlobRestProxy $blobClient, string $container, string $blob_name){
     $blobClient->deleteBlob($container, $blob_name);
+}
+
+/**
+ * @param BlobRestProxy $blobClient
+ * @param string $container
+ * @param string $blob
+ * @return resource|null
+ */
+function downloadBlobStreamContent(BlobRestProxy $blobClient,string $container, string $blob)
+{
+    try {
+        return $blobClient->getBlob($container, $blob)
+            ->getContentStream();
+    } catch (ServiceException $e) {
+        $code = $e->getCode();
+        $error_message = $e->getMessage();
+        echo $code.": ".$error_message.PHP_EOL;
+        return null;
+    }
 }

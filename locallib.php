@@ -64,6 +64,15 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
     return listBlobs($blobClient, $webgl);
 }
 
+function download_container_blobs(stdClass $webgl, $cm){
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+    downloadBlobs($blobClient, $webgl,$cm);
+}
+
+/**
+ * Delete azure blob container content.
+ * @param stdClass $webgl
+ */
 function delete_container_blobs(stdClass $webgl){
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
     deleteBlobs($blobClient, $webgl);
@@ -81,4 +90,14 @@ function str_replace_first($haystack, $needle, $replace)
     if ($pos !== false) {
         return substr_replace($haystack, $replace, 0, $pos );
     }
+}
+
+function tempdir() {
+    $tempfile=tempnam(sys_get_temp_dir(),'');
+    // you might want to reconsider this line when using this snippet.
+    // it "could" clash with an existing directory and this line will
+    // try to delete the existing one. Handle with caution.
+    if (file_exists($tempfile)) { unlink($tempfile); }
+    mkdir($tempfile);
+    if (is_dir($tempfile)) { return $tempfile; }
 }

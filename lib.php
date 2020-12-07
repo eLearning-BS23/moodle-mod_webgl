@@ -111,6 +111,49 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
 }
 
 /**
+ * Export folder resource contents
+ *
+ * @param $cm
+ * @param $baseurl
+ * @return array of file content
+ * @throws coding_exception
+ * @throws dml_exception
+ */
+function webgl_export_contents($cm, $baseurl) {
+    var_dump($cm, $baseurl);
+    global $CFG, $DB;
+    $contents = array();
+    $context = context_module::instance($cm->id);
+    $folder = $DB->get_record('webgl', array('id'=>$cm->instance), '*', MUST_EXIST);
+
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($context->id, 'mod_webgl', 'content', 0, 'sortorder DESC, id ASC', false);
+
+    foreach ($files as $fileinfo) {
+        $file = array();
+        $file['type'] = 'file';
+        $file['filename']     = $fileinfo->get_filename();
+        $file['filepath']     = $fileinfo->get_filepath();
+        $file['filesize']     = $fileinfo->get_filesize();
+        $file['fileurl']      = file_encode_url("$CFG->wwwroot/" . $baseurl, '/'.$context->id.'/mod_folder/content/'.$folder->revision.$fileinfo->get_filepath().$fileinfo->get_filename(), true);
+        $file['timecreated']  = $fileinfo->get_timecreated();
+        $file['timemodified'] = $fileinfo->get_timemodified();
+        $file['sortorder']    = $fileinfo->get_sortorder();
+        $file['userid']       = $fileinfo->get_userid();
+        $file['author']       = $fileinfo->get_author();
+        $file['license']      = $fileinfo->get_license();
+        $file['mimetype']     = $fileinfo->get_mimetype();
+        $file['isexternalfile'] = $fileinfo->is_external_file();
+        if ($file['isexternalfile']) {
+            $file['repositorytype'] = $fileinfo->get_repository_type();
+        }
+        $contents[] = $file;
+    }
+
+    return $contents;
+}
+
+/**
  * This standard function will check all instances of this module
  * and make sure there are up-to-date events created for each of them.
  * If courseid = 0, then every webgl event in the site is checked, else
