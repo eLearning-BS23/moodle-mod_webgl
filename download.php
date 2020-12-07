@@ -52,5 +52,4 @@ $zip->close();
 header('Content-Type: application/zip');
 header("Content-Disposition: attachment; filename = $download");
 header('Content-Length: ' . filesize($download));
-unlink($download);
 header("Location: $download");
