@@ -66,14 +66,13 @@ function uploadBlob(BlobRestProxy $blobClient, $blob_name, $content, string $con
     }
 }
 
-function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl,$cm){
-    global $USER;
-    $folder = rtrim($webgl->webgl_file,'.zip') ;
+function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl,$cm,$zip){
+//    $folder = rtrim($webgl->webgl_file,'.zip') ;
 //    mkdir(DIRECTORY_SEPARATOR.$folder);
 //    chmod(DIRECTORY_SEPARATOR.$folder, 0777);
 
-    $fs = get_file_storage();
-    $context = context_module::instance($cm->id);
+//    $fs = get_file_storage();
+//    $context = context_module::instance($cm->id);
 
 //    $fs->create_directory()
     try {
@@ -90,32 +89,13 @@ function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl,$cm){
             $count++;
             $blob_list = $blobClient->listBlobs($webgl->container_name, $listBlobsOptions);
             foreach ($blob_list->getBlobs() as $blob) {
-                $filearr = explode('/',$blob->getName());
-                var_dump($filearr);
-                for ($i=1;$i<count($filearr);$i++):
-                    var_dump(is_dir($filearr[$i]));
-                    var_dump($filearr[$i]);
-
-                endfor;
-                if ($count>3){
-                    die;
-                }
-//                $filerecord = new stdClass;
-//                $filerecord->contextid = $context->id;
-//                $filerecord->component = 'mod_webgl';
-//                $filerecord->filearea = 'content';
-//                $filerecord->itemid = 0;
-//                $filerecord->filepath = '/';
-//                $filerecord->userid = $USER->id;
-//
-//                $filerecord->filename = $blob->getName();
-//                $content = downloadBlobStreamContent($blobClient, $webgl->container_name, $blob->getName());
-//                $fs->create_file_from_string($filerecord,stream_get_contents($content));
+                $stream = downloadBlobStreamContent($blobClient, $webgl->container_name, $blob->getName());
+                $zip->addFromString($blob->getName(),stream_get_contents($stream));
             }
 
             $listBlobsOptions->setContinuationToken($blob_list->getContinuationToken());
         } while ($blob_list->getContinuationToken());
-//        send_file($webgl->webgl_file)
+        return $zip;
 
     } catch (ServiceException $e) {
         $code = $e->getCode();

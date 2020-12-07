@@ -44,11 +44,13 @@ if ($id) {
 require_login($course, true, $cm);
 
 
-$PAGE->set_url('/mod/webgl/download.php', array('id' => $cm->id));
-$PAGE->set_title(format_string($webgl->name));
-$PAGE->set_heading(format_string($course->fullname));
-$PAGE->set_cacheable(false);
-$context = context_course::instance($course->id);
-
-echo $OUTPUT->header();
-echo $OUTPUT->footer();
+$zip = new ZipArchive;
+$download = 'download.zip';
+$zip->open($download, ZipArchive::CREATE);
+download_container_blobs($webgl, $cm, $zip);
+$zip->close();
+header('Content-Type: application/zip');
+header("Content-Disposition: attachment; filename = $download");
+header('Content-Length: ' . filesize($download));
+unlink($download);
+header("Location: $download");

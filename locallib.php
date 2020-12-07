@@ -9,6 +9,7 @@
  * @throws moodle_exception
  */
 
+
 require_once 'classes/BlobStorage.php';
 
 /**
@@ -64,9 +65,9 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
     return listBlobs($blobClient, $webgl);
 }
 
-function download_container_blobs(stdClass $webgl, $cm){
+function download_container_blobs(stdClass $webgl, $cm,$zip){
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
-    downloadBlobs($blobClient, $webgl,$cm);
+    downloadBlobs($blobClient, $webgl,$cm,$zip);
 }
 
 /**
@@ -92,12 +93,4 @@ function str_replace_first($haystack, $needle, $replace)
     }
 }
 
-function tempdir() {
-    $tempfile=tempnam(sys_get_temp_dir(),'');
-    // you might want to reconsider this line when using this snippet.
-    // it "could" clash with an existing directory and this line will
-    // try to delete the existing one. Handle with caution.
-    if (file_exists($tempfile)) { unlink($tempfile); }
-    mkdir($tempfile);
-    if (is_dir($tempfile)) { return $tempfile; }
-}
+
