@@ -93,6 +93,12 @@ class mod_webgl_mod_form extends moodleform_mod {
         $ContainerName = get_config('webgl','ContainerName');
         $mform->setDefault('container_name',$ContainerName);
 
+        $mform->addElement('advcheckbox', 'store_zip_file', get_string('store_zip_file', 'webgl'));
+        $mform->addHelpButton('store_zip_file', 'store_zip_file', 'webgl');
+        $mform->addRule('store_zip_file', null, 'required', null, 'client');
+        $store_zip_file = get_config('webgl','store_zip_file');
+        $mform->setDefault('store_zip_file',$store_zip_file);
+
 
 
         $this->standard_grading_coursemodule_elements();

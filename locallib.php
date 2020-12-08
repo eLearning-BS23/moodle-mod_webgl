@@ -18,7 +18,8 @@ require_once 'classes/BlobStorage.php';
  * @return string
  */
 function cloudstoragewebglcontentprefix(stdClass $webgl){
-    return "course-$webgl->course"."-module-id-$webgl->id";
+    $hostname = gethostname();
+    return "$hostname-course-$webgl->course"."-module-id-$webgl->id";
 }
 
 /**
@@ -63,6 +64,22 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
         }
     endforeach;
     return listBlobs($blobClient, $webgl);
+}
+
+/**
+ * Extracts the imported zip contents.
+ * Push to Azure BLOB storage.
+ * @param stdClass $webgl
+ * @param string $content
+ * @return void
+ */
+function import_zip_contents(stdClass $webgl, string $content) : void {
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+    $prefix = cloudstoragewebglcontentprefix($webgl);
+    $filename =  $prefix.DIRECTORY_SEPARATOR.$webgl->webgl_file;
+    $contetnttype = "application/octet-stream";
+
+    uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
 }
 
 /**

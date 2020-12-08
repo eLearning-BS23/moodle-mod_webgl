@@ -21,4 +21,8 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('webgl/ContainerName',
         get_string('container_name', 'mod_webgl'), get_string('container_name_help', 'mod_webgl'), '', PARAM_TEXT, 90));
 
+    $settings->add(new admin_setting_configcheckbox('webgl/store_zip_file',
+        get_string('store_zip_file', 'mod_webgl'),
+        get_string('store_zip_file_help', 'mod_webgl'), 1));
+
 }

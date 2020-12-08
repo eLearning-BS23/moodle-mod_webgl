@@ -45,6 +45,9 @@ $string['account_key_help'] = 'When you create a storage account, Azure generate
 $string['container_name'] = 'Blob storage container';
 $string['container_name_help'] = 'Azure Blob Storage helps you create data lakes for your analytics needs, and provides storage to build powerful cloud-native and mobile apps. Optimize costs with tiered storage for your long-term data, and flexibly scale up for high-performance computing and machine learning workloads.';
 
+$string['store_zip_file'] = 'Upload zip file';
+$string['store_zip_file_help'] = 'Also upload Uploaded zip file to Azure Blob storage.';
+
 $string['storage'] = 'Storage details';
 $string['storage'] = 'Storage details';
 /////////////////////////////////

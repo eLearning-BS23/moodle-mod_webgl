@@ -16,6 +16,7 @@
         <FIELD NAME="account_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Account Name"/>
         <FIELD NAME="account_key" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Account Key"/>
         <FIELD NAME="container_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Azure BLOB storage Container name"/>
+        <FIELD NAME="store_zip_file" TYPE="char" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Also upload Uploaded zip file to Azure Blob storage"/>
         <FIELD NAME="index_file_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="webgl index file url"/>
         <FIELD NAME="validity" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Validity"/>
         //TODO: redirect should be a bool or char but was having issues writing to the DB

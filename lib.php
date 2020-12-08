@@ -68,13 +68,23 @@ function webgl_supports($feature) {
  */
 function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB;
+    $elname = 'importfile';
     $webgl->webgl_file = $mform->get_new_filename('importfile');
     $webgl->timecreated = time();
     $webgl->id = $DB->insert_record('webgl', $webgl);
-    $res = $mform->save_temp_file('importfile');
+    $res = $mform->save_temp_file($elname);
     $blobdatadetails = import_extract_upload_contents($webgl, $res);
     $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
     $DB->update_record('webgl', $webgl);
+
+    if ($webgl->store_zip_file){
+        $zipcontent = $mform->get_file_content($elname);
+        import_zip_contents($webgl, $zipcontent);
+    }
+
+    if ($res){
+        @unlink($res);
+    }
     return $webgl->id;
 }
 
@@ -92,16 +102,26 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
  */
 function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
     global $DB,$USER;
+    $elname = 'importfile';
 
     // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;
-    $basefilename = $mform->get_new_filename('importfile');
+    $basefilename = $mform->get_new_filename($elname);
     if ($basefilename){
         $res = $mform->save_temp_file('importfile');
         $blobdatadetails = import_extract_upload_contents($webgl, $res);
         $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
         $webgl->webgl_file = $basefilename;
+
+        if ($webgl->store_zip_file){
+            $zipcontent = $mform->get_file_content($elname);
+            import_zip_contents($webgl, $zipcontent);
+        }
+
+        if ($res){
+            @unlink($res);
+        }
 
     }
 
