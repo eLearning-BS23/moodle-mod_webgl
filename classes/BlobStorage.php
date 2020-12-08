@@ -66,15 +66,17 @@ function uploadBlob(BlobRestProxy $blobClient, $blob_name, $content, string $con
     }
 }
 
-function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl,$cm,$zip){
-//    $folder = rtrim($webgl->webgl_file,'.zip') ;
-//    mkdir(DIRECTORY_SEPARATOR.$folder);
-//    chmod(DIRECTORY_SEPARATOR.$folder, 0777);
-
-//    $fs = get_file_storage();
-//    $context = context_module::instance($cm->id);
-
-//    $fs->create_directory()
+/**
+ * Download blob content.
+ *
+ * @param BlobRestProxy $blobClient
+ * @param stdClass $webgl
+ * @return array
+ */
+function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl): array
+{
+    $zipper   = get_file_packer('application/zip');
+    $temppath = make_request_directory() .DIRECTORY_SEPARATOR. $webgl->webgl_file;
     try {
         // List blobs.
         $listBlobsOptions = new ListBlobsOptions();
@@ -83,20 +85,22 @@ function downloadBlobs(BlobRestProxy $blobClient, stdClass $webgl,$cm,$zip){
         // Setting max result to 1 is just to demonstrate the continuation token.
         // It is not the recommended value in a product environment.
         $listBlobsOptions->setMaxResults(1);
-        $count = 1;
 
         do {
-            $count++;
             $blob_list = $blobClient->listBlobs($webgl->container_name, $listBlobsOptions);
             foreach ($blob_list->getBlobs() as $blob) {
+                $filename = str_replace_first($blob->getName(), '/', "");
                 $stream = downloadBlobStreamContent($blobClient, $webgl->container_name, $blob->getName());
-                $zip->addFromString($blob->getName(),stream_get_contents($stream));
+                $string_archive[$filename] = [stream_get_contents($stream)];
+                if ($zipper->archive_to_pathname($string_archive, $temppath)) {
+                    echo 'OKay'.PHP_EOL;
+                } else {
+                    print_error('cannotdownloaddir', 'repository');
+                }
             }
-
             $listBlobsOptions->setContinuationToken($blob_list->getContinuationToken());
         } while ($blob_list->getContinuationToken());
-        return $zip;
-
+        send_temp_file($temppath, $webgl->webgl_file);
     } catch (ServiceException $e) {
         $code = $e->getCode();
         $error_message = $e->getMessage();

@@ -24,6 +24,7 @@
 
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once($CFG->libdir . '/setuplib.php');
 require_once(dirname(__FILE__) . '/lib.php');
 require_once(dirname(__FILE__) . '/classes/BlobStorage.php');
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
@@ -43,13 +44,4 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-
-$zip = new ZipArchive;
-$download = 'download.zip';
-$zip->open($download, ZipArchive::CREATE);
-download_container_blobs($webgl, $cm, $zip);
-$zip->close();
-header('Content-Type: application/zip');
-header("Content-Disposition: attachment; filename = $download");
-header('Content-Length: ' . filesize($download));
-header("Location: $download");
+download_container_blobs($webgl);

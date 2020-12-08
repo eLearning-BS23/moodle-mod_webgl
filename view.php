@@ -66,7 +66,7 @@ if ($webgl->intro) {
 }
 
 ?>
-    <iframe width="100%" height="400px" src="<?php echo $webgl->index_file_url;?>" frameborder="0"></iframe>
+    <iframe allowfullscreen="true" width="100%" height="400px" src="<?php echo $webgl->index_file_url;?>" frameborder="0"></iframe>
 <?php
 
 echo $OUTPUT->footer();

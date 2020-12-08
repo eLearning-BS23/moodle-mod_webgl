@@ -65,9 +65,21 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
     return listBlobs($blobClient, $webgl);
 }
 
-function download_container_blobs(stdClass $webgl, $cm,$zip){
+/**
+ * @param stdClass $webgl
+ * @return void
+ */
+function download_container_blobs(stdClass $webgl): void
+{
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
-    downloadBlobs($blobClient, $webgl,$cm,$zip);
+//    $zipper   = get_file_packer('application/zip');
+//    $temppath = make_request_directory() .DIRECTORY_SEPARATOR. $webgl->webgl_file;
+    $files = downloadBlobs($blobClient, $webgl);
+//    if ($zipper->archive_to_pathname($files, $temppath)) {
+//        send_temp_file($temppath, $webgl->webgl_file);
+//    } else {
+//        print_error('cannotdownloaddir', 'repository');
+//    }
 }
 
 /**
