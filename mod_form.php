@@ -46,15 +46,19 @@ class mod_webgl_mod_form extends moodleform_mod {
         if ($is_update_form > 0) {
             $dataforform = $DB->get_record('course_modules', array('id' => $is_update_form));
             $moduledata = $DB->get_record('webgl', array('id' => $dataforform->instance));
-            $ancor = '<div id="fitem_id_webgl_file" class="form-group row  fitem">
+            if ($moduledata->store_zip_file){
+                $filename = str_replace('index.html',$moduledata->webgl_file,$moduledata->index_file_url);
+                $ancor = '<div id="fitem_id_webgl_file" class="form-group row  fitem">
                         <div class="col-md-3">
                             <label class="col-form-label d-inline " for="id_webgl_file">&nbsp;</label>
                         </div>
                         <div class="col-md-9 form-inline felement" data-fieldtype="text" id="id_webgl_file">
-                            <a target="_blank" href="/mod/webgl/download.php?id='.$is_update_form.'">Download '.$moduledata->webgl_file.'</a>
+                            <a target="_blank" href="'.$filename.'">Download '.$moduledata->webgl_file.'</a>
                         </div>
                     </div>';
-            $mform->addElement('html', $ancor);
+                $mform->addElement('html', $ancor);
+            }
+
         }
 
 
