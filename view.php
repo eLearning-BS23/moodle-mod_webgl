@@ -60,13 +60,21 @@ $PAGE->set_cacheable(false);
 $context = context_course::instance($course->id);
 
 echo $OUTPUT->header();
+$iframe = '<iframe allowfullscreen="true" width="'.$webgl->iframe_width.'" height="'.$webgl->iframe_height.'" src="'.$webgl->index_file_url.'" frameborder="0"></iframe>';
 
-if ($webgl->intro) {
-    echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
+
+
+if ($webgl->before_description){
+    echo $OUTPUT->box($iframe);
+    if ($webgl->intro) {
+        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
+    }
+
+}else{
+    if ($webgl->intro) {
+        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
+    }
+    echo $OUTPUT->box($iframe);
 }
-
-?>
-    <iframe allowfullscreen="true" width="100%" height="400px" src="<?php echo $webgl->index_file_url;?>" frameborder="0"></iframe>
-<?php
 
 echo $OUTPUT->footer();
