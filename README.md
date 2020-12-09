@@ -31,10 +31,10 @@ git clone https://github.com/Azure/azure-storage-php.git webgl
 cd webgl
 
 ```
-3. Download **[composer.phar](http://getcomposer.org/composer.phar)** in webgl directory.
-
-4. Open a command prompt and execute following commands 
-
+3. Open a command prompt and execute following commands (Optional) 
 ```
 php composer.phar install
 ```
+
+## Plugin Settings 
+![img.png](img.png)
