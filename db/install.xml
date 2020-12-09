@@ -18,9 +18,10 @@
         <FIELD NAME="container_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Azure BLOB storage Container name"/>
         <FIELD NAME="store_zip_file" TYPE="char" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Also upload Uploaded zip file to Azure Blob storage"/>
         <FIELD NAME="index_file_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="webgl index file url"/>
-        <FIELD NAME="validity" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Validity"/>
+        <FIELD NAME="iframe_height" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="iframe height"/>
         //TODO: redirect should be a bool or char but was having issues writing to the DB
-        <FIELD NAME="redirect" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Redirect"/>
+        <FIELD NAME="iframe_width" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="iframe width"/>
+        <FIELD NAME="before_description" TYPE="char" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="before description"/>
 
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>

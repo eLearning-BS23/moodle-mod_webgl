@@ -68,7 +68,6 @@ class mod_webgl_mod_form extends moodleform_mod {
             }
             $mform->addElement('html', $ancor);
 
-
         }
 
 
@@ -82,6 +81,25 @@ class mod_webgl_mod_form extends moodleform_mod {
         }else{
             $mform->addRule('importfile', null, 'required');
         }
+
+        $mform->addElement('text', 'iframe_height', get_string('iframe_height', 'webgl'));
+        $mform->setType('iframe_height', PARAM_TEXT);
+        $mform->addHelpButton('iframe_height', 'iframe_height', 'webgl');
+        $mform->addRule('iframe_height', null, 'required', null, 'client');
+        $iframe_height = get_config('webgl','iframe_height');
+        $mform->setDefault('iframe_height',$iframe_height);
+
+        $mform->addElement('text', 'iframe_width', get_string('iframe_width', 'webgl'));
+        $mform->setType('iframe_width', PARAM_TEXT);
+        $mform->addHelpButton('iframe_width', 'iframe_width', 'webgl');
+        $mform->addRule('iframe_width', null, 'required', null, 'client');
+        $iframe_width = get_config('webgl','iframe_width');
+        $mform->setDefault('iframe_width',$iframe_width);
+
+
+        $mform->addElement('advcheckbox', 'before_description', get_string('before_description', 'webgl'));
+        $mform->addHelpButton('before_description', 'before_description', 'webgl');
+        $mform->addRule('before_description', null, 'required', null, 'client');
 
         // Storage form fields goes here.
         $mform->addElement('header', 'storage', get_string('storage', 'webgl'));

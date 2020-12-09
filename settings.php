@@ -25,4 +25,13 @@ if ($ADMIN->fulltree) {
         get_string('store_zip_file', 'mod_webgl'),
         get_string('store_zip_file_help', 'mod_webgl'), 1));
 
+
+    $settings->add(new admin_setting_configtext('webgl/iframe_height',
+        get_string('iframe_height', 'mod_webgl'),
+        get_string('iframe_height_help', 'mod_webgl'), '600px', PARAM_TEXT,10));
+
+    $settings->add(new admin_setting_configtext('webgl/iframe_width',
+        get_string('iframe_width', 'mod_webgl'),
+        get_string('iframe_width_help', 'mod_webgl'), '100%', PARAM_TEXT,10));
+
 }

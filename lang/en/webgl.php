@@ -48,6 +48,16 @@ $string['container_name_help'] = 'Azure Blob Storage helps you create data lakes
 $string['store_zip_file'] = 'Upload zip file';
 $string['store_zip_file_help'] = 'Also upload Uploaded zip file to Azure Blob storage.';
 
+$string['iframe_height'] = 'Content Height';
+$string['iframe_height_help'] = 'Height of the Iframe that load WebGL content in (pixels, (r)em, percentages). Default Value is 550px.';
+
+$string['iframe_width'] = 'Content Width';
+$string['iframe_width_help'] = 'Width of the Iframe that load WebGL content in (pixels, (r)em, percentages). Default Value is 100%.';
+$moduleintro = get_string('moduleintro');
+
+$string['before_description'] = 'Show WebGL content before '.$moduleintro.' section.';
+$string['before_description_help'] = 'By default WebGL content will show after '.$moduleintro.' section. Check the checkbox If you want to show content before '.$moduleintro.' section ';
+
 $string['storage'] = 'Storage details';
 $string['storage'] = 'Storage details';
 /////////////////////////////////
