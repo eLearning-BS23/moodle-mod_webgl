@@ -1,4 +1,4 @@
-# Microsoft Azure Storage WebGL content upload
+# Moodle WebGL Activity plugin with Azure Blob storage WebGL content Upload
 
 
 # Getting Started
@@ -20,14 +20,14 @@
 To get the source code from GitHub, type
 
 ```
-git clone https://github.com/Azure/azure-storage-php.git
+git clone https://github.com/eLearning-BS23/webgl.git
 ```
 
 ## Installation
 1. Go to Project root/mod directory 
 2. clone code by using following commands
 ```
-git clone https://github.com/Azure/azure-storage-php.git webgl
+git clone https://github.com/eLearning-BS23/webgl.git webgl
 cd webgl
 
 ```
