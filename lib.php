@@ -37,16 +37,15 @@ require_once 'locallib.php';
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
  */
-function webgl_supports($feature) {
+function webgl_supports(string $feature): ?bool
+{
 
     switch($feature) {
+        case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_MOD_INTRO:
             return true;
-        case FEATURE_SHOW_DESCRIPTION:
-            return true;
-        case FEATURE_GRADE_HAS_GRADE:
-            return false;
         case FEATURE_BACKUP_MOODLE2:
+        case FEATURE_GRADE_HAS_GRADE:
             return false;
         default:
             return null;
@@ -64,9 +63,10 @@ function webgl_supports($feature) {
  * @param stdClass $webgl Submitted data from the form in mod_form.php
  * @param mod_webgl_mod_form|null $mform The form instance itself (if needed)
  * @return int The id of the newly inserted webgl record
- * @throws dml_exception
+ * @throws dml_exception|moodle_exception
  */
-function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
+function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): int
+{
     global $DB;
     $elname = 'importfile';
     $webgl->webgl_file = $mform->get_new_filename('importfile');
@@ -97,10 +97,13 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
  * will update an existing instance with new data.
  *
  * @param stdClass $webgl An object from the form in mod_form.php
- * @param mod_webgl_mod_form $mform The form instance itself (if needed)
+ * @param mod_webgl_mod_form|null $mform The form instance itself (if needed)
  * @return boolean Success/Fail
+ * @throws dml_exception
+ * @throws moodle_exception
  */
-function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null) {
+function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): bool
+{
     global $DB,$USER;
     $elname = 'importfile';
 
@@ -125,9 +128,7 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
 
     }
 
-    $result = $DB->update_record('webgl', $webgl);
-
-    return $result;
+    return $DB->update_record('webgl', $webgl);
 }
 
 
@@ -140,8 +141,10 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
  *
  * @param int $courseid Course ID
  * @return bool
+ * @throws dml_exception
  */
-function webgl_refresh_events($courseid = 0) {
+function webgl_refresh_events($courseid = 0): bool
+{
     global $DB;
 
     if ($courseid == 0) {
@@ -171,8 +174,10 @@ function webgl_refresh_events($courseid = 0) {
  *
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
+ * @throws dml_exception
  */
-function webgl_delete_instance($id) {
+function webgl_delete_instance($id): bool
+{
     global $DB;
 
     if (! $webgl = $DB->get_record('webgl', array('id' => $id))) {
@@ -202,7 +207,8 @@ function webgl_delete_instance($id) {
  * @param stdClass $webgl The webgl instance record
  * @return stdClass|null
  */
-function webgl_user_outline($course, $user, $mod, $webgl) {
+function webgl_user_outline($course, $user, $mod, $webgl): ?stdClass
+{
 
     $return = new stdClass();
     $return->time = 0;
@@ -416,7 +422,8 @@ function webgl_update_grades(stdClass $webgl, $userid = 0) {
  * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
  */
-function webgl_get_file_areas($course, $cm, $context) {
+function webgl_get_file_areas($course, $cm, $context): array
+{
     return array();
 }
 
@@ -437,7 +444,8 @@ function webgl_get_file_areas($course, $cm, $context) {
  * @param string $filename
  * @return file_info instance or null if not found
  */
-function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename): ?file_info
+{
     return null;
 }
 

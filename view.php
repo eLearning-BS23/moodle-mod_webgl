@@ -57,24 +57,88 @@ $PAGE->set_url('/mod/webgl/view.php', array('id' => $cm->id));
 $PAGE->set_title(format_string($webgl->name));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_cacheable(false);
+$PAGE->set_pagelayout('embedded');
 $context = context_course::instance($course->id);
-
+?>
+    <style>
+        body {
+            display: block;
+            margin: 0 !important;
+        }
+    </style>
+<?php
 echo $OUTPUT->header();
-$iframe = '<iframe allowfullscreen="true" width="'.$webgl->iframe_width.'" height="'.$webgl->iframe_height.'" src="'.$webgl->index_file_url.'" frameborder="0"></iframe>';
+$iframe = '<iframe  
+//width="'.$webgl->iframe_width.'" 
+//height="'.$webgl->iframe_height.'" 
+frameborder="0" 
+allowfullscreen
+style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;"
+src="'.$webgl->index_file_url.'" frameborder="0"></iframe>';
+echo $iframe;
+?>
+</div>
+</div>
+</div>
+</body>
+<?php
 
 
+//if ($webgl->before_description){
+//    echo $OUTPUT->box($iframe, 'generalbox mod_webglbox','webgl-content-loader');
+//    if ($webgl->intro) {
+////        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
+//    }
+//
+//}else{
+//    if ($webgl->intro) {
+////        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
+//    }
+//    echo $OUTPUT->box($iframe,'generalbox mod_webglbox','webgl-content-loader');
+//    echo $iframe;
+//}
 
-if ($webgl->before_description){
-    echo $OUTPUT->box($iframe);
-    if ($webgl->intro) {
-        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
-    }
 
-}else{
-    if ($webgl->intro) {
-        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
-    }
-    echo $OUTPUT->box($iframe);
-}
+//$PAGE->requires->js_amd_inline("
+//require(['jquery'], function($) {
+//        var webgl_content_loader = $('#webgl-content-loader');
+//        console.log(webgl_content_loader)
+//        webgl_content_loader.on('click', function() {
+//            console.info('WebGL content going to be fullscreen.');
+//            // if already full screen; exit
+//            // else go fullscreen
+//            if (
+//                document.fullscreenElement ||
+//                document.webkitFullscreenElement ||
+//                document.mozFullScreenElement ||
+//                document.msFullscreenElement
+//            ) {
+//                if (document.exitFullscreen) {
+//                    document.exitFullscreen();
+//                } else if (document.mozCancelFullScreen) {
+//                    document.mozCancelFullScreen();
+//                } else if (document.webkitExitFullscreen) {
+//                    document.webkitExitFullscreen();
+//                } else if (document.msExitFullscreen) {
+//                    document.msExitFullscreen();
+//                }
+//            } else {
+//                element = webgl_content_loader.get(0);
+//                if (element.requestFullscreen) {
+//                    element.requestFullscreen();
+//                } else if (element.mozRequestFullScreen) {
+//                    element.mozRequestFullScreen();
+//                } else if (element.webkitRequestFullscreen) {
+//                    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+//                } else if (element.msRequestFullscreen) {
+//                    element.msRequestFullscreen();
+//                }
+//            }
+//        });
+//        setTimeout(function(){
+////         webgl_content_loader.click();
+//        }, 3000);
+//
+//});");
 
-echo $OUTPUT->footer();
+//echo $OUTPUT->footer();
