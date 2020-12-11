@@ -65,23 +65,41 @@ $context = context_course::instance($course->id);
             display: block;
             margin: 0 !important;
         }
+        .webgl-iframe-content-loader{
+            background: #fff;
+            position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;
+        }
+        .iframe{
+            position:relative;
+            top:0;left:0;right:0;width:100%;
+        }
+        .course-footer-nav{
+            position:relative;
+            left:0;bottom:10%;right:0;width:100%;
+        }
+        hr {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            border: 0;
+            border-top: 0 !important;
+        }
     </style>
 <?php
 echo $OUTPUT->header();
-$iframe = '<iframe  
-//width="'.$webgl->iframe_width.'" 
-//height="'.$webgl->iframe_height.'" 
-frameborder="0" 
-allowfullscreen
-style="position:absolute;top:0;left:0;bottom:0;right:0;width:100%;height:100%;"
-src="'.$webgl->index_file_url.'" frameborder="0"></iframe>';
+$iframe = '
+<div class="webgl-iframe-content-loader">
+<iframe  
+width="100%"
+height="100%"
+frameborder="0"
+src="'.$webgl->index_file_url.'" ></iframe>';
 echo $iframe;
-?>
-</div>
-</div>
-</div>
-</body>
-<?php
+//var_dump($PAGE->context);
+echo activity_navigation($PAGE);
+echo '</div>';
+//$activitynav = new \core_course\output\activity_navigation($prevmod, $nextmod, $activitylist);
+//$renderer = $this->page->get_renderer('core', 'course');
+//return $renderer->render($activitynav);
 
 
 //if ($webgl->before_description){
@@ -99,46 +117,11 @@ echo $iframe;
 //}
 
 
-//$PAGE->requires->js_amd_inline("
-//require(['jquery'], function($) {
-//        var webgl_content_loader = $('#webgl-content-loader');
-//        console.log(webgl_content_loader)
-//        webgl_content_loader.on('click', function() {
-//            console.info('WebGL content going to be fullscreen.');
-//            // if already full screen; exit
-//            // else go fullscreen
-//            if (
-//                document.fullscreenElement ||
-//                document.webkitFullscreenElement ||
-//                document.mozFullScreenElement ||
-//                document.msFullscreenElement
-//            ) {
-//                if (document.exitFullscreen) {
-//                    document.exitFullscreen();
-//                } else if (document.mozCancelFullScreen) {
-//                    document.mozCancelFullScreen();
-//                } else if (document.webkitExitFullscreen) {
-//                    document.webkitExitFullscreen();
-//                } else if (document.msExitFullscreen) {
-//                    document.msExitFullscreen();
-//                }
-//            } else {
-//                element = webgl_content_loader.get(0);
-//                if (element.requestFullscreen) {
-//                    element.requestFullscreen();
-//                } else if (element.mozRequestFullScreen) {
-//                    element.mozRequestFullScreen();
-//                } else if (element.webkitRequestFullscreen) {
-//                    element.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-//                } else if (element.msRequestFullscreen) {
-//                    element.msRequestFullscreen();
-//                }
-//            }
-//        });
-//        setTimeout(function(){
-////         webgl_content_loader.click();
-//        }, 3000);
-//
-//});");
+$PAGE->requires->js_amd_inline("
+require(['jquery'], function($) {
+    var height = $(window).height();;
+    var footernavheight = $('.course-footer-nav').height();
+    $('iframe').height(height - footernavheight);
+});");
 
-//echo $OUTPUT->footer();
+echo $OUTPUT->footer();
