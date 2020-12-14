@@ -204,7 +204,7 @@ function  activity_navigation($PAGE) {
         $nexttotalurl = '<a href="'.$linkurlnext.'" id="next-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknamenext.'"> '.$linknamenext.'</a>';
     }
     $sectioname = $section->name ?? get_string('sectionname','format_'.$course->format).' '.$section->section;
-    $sectioninfourl = $prevtotalurl ?'<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$sectioname.'">' .$sectioname.'</a>' : '';
+    $sectioninfourl = $section->section > 0 ? '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$sectioname.'">' .$sectioname.'</a>':'';
 
     return '<div class="course-footer-nav">
         <hr class="hr">
