@@ -123,6 +123,7 @@ function str_replace_first($haystack, $needle, $replace)
 }
 
 function  activity_navigation($PAGE) {
+    global $CFG;
     // First we should check if we want to add navigation.
     $context = $PAGE->context;
 
@@ -144,6 +145,7 @@ function  activity_navigation($PAGE) {
 
         // No need to add the current module to the list for the activity dropdown menu.
         if ($module->id == $PAGE->cm->id) {
+
             $curentmodsection = $module->get_section_info();
             $section = $curentmodsection;
             continue;
@@ -201,7 +203,8 @@ function  activity_navigation($PAGE) {
         }
         $nexttotalurl = '<a href="'.$linkurlnext.'" id="next-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknamenext.'"> '.$linknamenext.'</a>';
     }
-    $sectioninfourl = '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$section->name.'">' .$section->name.'</a>';
+    $sectioname = $section->name ?? get_string('sectionname','format_'.$course->format).' '.$section->section;
+    $sectioninfourl = '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$sectioname.'">' .$sectioname.'</a>';
 
     return '<div class="course-footer-nav">
         <hr class="hr">
