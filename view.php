@@ -83,6 +83,21 @@ $context = context_course::instance($course->id);
             border: 0;
             border-top: 0 !important;
         }
+        #activity-link{
+            position: relative;
+            padding: 14px 20px 14px 20px;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            border-radius: 5px;
+            font-size: .85rem;
+            font-weight: 500;
+            line-height: 180%;
+            text-decoration: none;
+            -webkit-transition: all 350ms ease;
+            -o-transition: all 350ms ease;
+            transition: all 350ms ease;
+        }
     </style>
 <?php
 echo $OUTPUT->header();
@@ -94,28 +109,8 @@ height="100%"
 frameborder="0"
 src="'.$webgl->index_file_url.'" ></iframe>';
 echo $iframe;
-//var_dump($PAGE->context);
 echo activity_navigation($PAGE);
 echo '</div>';
-//$activitynav = new \core_course\output\activity_navigation($prevmod, $nextmod, $activitylist);
-//$renderer = $this->page->get_renderer('core', 'course');
-//return $renderer->render($activitynav);
-
-
-//if ($webgl->before_description){
-//    echo $OUTPUT->box($iframe, 'generalbox mod_webglbox','webgl-content-loader');
-//    if ($webgl->intro) {
-////        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
-//    }
-//
-//}else{
-//    if ($webgl->intro) {
-////        echo $OUTPUT->box(format_module_intro('webgl', $webgl, $cm->id), 'generalbox mod_introbox', 'webglintro');
-//    }
-//    echo $OUTPUT->box($iframe,'generalbox mod_webglbox','webgl-content-loader');
-//    echo $iframe;
-//}
-
 
 $PAGE->requires->js_amd_inline("
 require(['jquery'], function($) {
@@ -123,5 +118,4 @@ require(['jquery'], function($) {
     var footernavheight = $('.course-footer-nav').height();
     $('iframe').height(height - footernavheight);
 });");
-
-echo $OUTPUT->footer();
+    echo $OUTPUT->footer();

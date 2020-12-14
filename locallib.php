@@ -122,14 +122,15 @@ function str_replace_first($haystack, $needle, $replace)
     }
 }
 
-function   activity_navigation($PAGE) {
+function  activity_navigation($PAGE) {
     // First we should check if we want to add navigation.
     $context = $PAGE->context;
 
-
-//    // Get a list of all the activities in the course.
+    // Get a list of all the activities in the course.
     $course = $PAGE->cm->get_course();
     $modules = get_fast_modinfo($course->id)->get_cms();
+
+    $section = 1;
 
     // Put the modules into an array in order by the position they are shown in the course.
     $mods = [];
@@ -143,6 +144,8 @@ function   activity_navigation($PAGE) {
 
         // No need to add the current module to the list for the activity dropdown menu.
         if ($module->id == $PAGE->cm->id) {
+            $curentmodsection = $module->get_section_info();
+            $section = $curentmodsection->section;
             continue;
         }
         // Module name.
@@ -152,9 +155,9 @@ function   activity_navigation($PAGE) {
             $modname .= ' ' . get_string('hiddenwithbrackets');
         }
         // Module URL.
-        $linkurl = new moodle_url($module->url, array('forceview' => 1));
+        $linkurlnext = new moodle_url($module->url, array('forceview' => 1));
         // Add module URL (as key) and name (as value) to the activity list array.
-        $activitylist[$linkurl->out(false)] = $modname;
+        $activitylist[$linkurlnext->out(false)] = $modname;
     }
 
     $nummods = count($mods);
@@ -169,23 +172,51 @@ function   activity_navigation($PAGE) {
 
     // Get the position in the array of the course module we are viewing.
     $position = array_search($PAGE->cm->id, $modids);
+    $sectionurl = new moodle_url('/course/view.php',['id'=>$course->id,'section'=>$section]);
 
     $prevmod = null;
     $nextmod = null;
+    $prevtotalurl = null;
+    $nexttotalurl = null;
 
     // Check if we have a previous mod to show.
     if ($position > 0) {
         $prevmod = $mods[$modids[$position - 1]];
+        $linkurlprev = new \moodle_url($prevmod->url, array('forceview' => 1));
+        $linknameprev = $prevmod->get_formatted_name();
+        if (!$prevmod->visible) {
+            $linknameprev .= ' ' . get_string('hiddenwithbrackets');
+        }
+        $prevtotalurl = '<a href="'.$linkurlprev.'" id="prev-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknameprev.'">'.$linknameprev.'</a>';
     }
+
 
     // Check if we have a next mod to show.
     if ($position < ($nummods - 1)) {
         $nextmod = $mods[$modids[$position + 1]];
+        $linkurlnext = new \moodle_url($nextmod->url, array('forceview' => 1));
+        $linknamenext = $nextmod->get_formatted_name();
+        if (!$nextmod->visible) {
+            $linknamenext .= ' ' . get_string('hiddenwithbrackets');
+        }
+        $nexttotalurl = '<a href="'.$linkurlnext.'" id="next-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknamenext.'"> '.$linknamenext.'</a>';
     }
+    $sectioninfourl = '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$course->shortname.'">'.$course->shortname.'</a>';
 
-    $activitynav = new \core_course\output\activity_navigation($prevmod, $nextmod, $activitylist);
-    $renderer = $PAGE->get_renderer('core', 'course');
-    return $renderer->render($activitynav);
+    return '<div class="course-footer-nav">
+        <hr class="hr">
+        <div class="row">
+            <div class="col-sm-12 col-md">
+                <div class="pull-left">'.$prevtotalurl.'</div>
+            </div>
+            <div class="col-sm-12 col-md-2">
+                <div class="mdl-align" >'.$sectioninfourl.'</div>
+            </div>
+            <div class="col-sm-12 col-md">
+                <div class="pull-right">'.$nexttotalurl.'</div>
+            </div>
+        </div>
+    </div>';
 }
 
 
