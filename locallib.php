@@ -145,7 +145,7 @@ function  activity_navigation($PAGE) {
         // No need to add the current module to the list for the activity dropdown menu.
         if ($module->id == $PAGE->cm->id) {
             $curentmodsection = $module->get_section_info();
-            $section = $curentmodsection->section;
+            $section = $curentmodsection;
             continue;
         }
         // Module name.
@@ -172,7 +172,7 @@ function  activity_navigation($PAGE) {
 
     // Get the position in the array of the course module we are viewing.
     $position = array_search($PAGE->cm->id, $modids);
-    $sectionurl = new moodle_url('/course/view.php',['id'=>$course->id,'section'=>$section]);
+    $sectionurl = new moodle_url('/course/view.php',['id'=>$course->id,'section'=>$section->section]);
 
     $prevmod = null;
     $nextmod = null;
@@ -201,7 +201,7 @@ function  activity_navigation($PAGE) {
         }
         $nexttotalurl = '<a href="'.$linkurlnext.'" id="next-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknamenext.'"> '.$linknamenext.'</a>';
     }
-    $sectioninfourl = '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$course->shortname.'">'.$course->shortname.'</a>';
+    $sectioninfourl = '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$section->name.'">' .$section->name.'</a>';
 
     return '<div class="course-footer-nav">
         <hr class="hr">
