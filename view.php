@@ -109,13 +109,21 @@ height="100%"
 frameborder="0"
 src="'.$webgl->index_file_url.'" ></iframe>';
 echo $iframe;
-echo activity_navigation($PAGE);
+?>
+    <a href="/course/view.php?id=<?php echo $course->id;?>" style="position: absolute;left: 0;bottom: 0;background: #fff;padding: 12px;color: #424242;text-decoration: none;font-size: 15px;    border-radius: 4px;">
+        <i class="fas fa-arrow-left closed"></i>
+        <span class="p-3">TILBAKE</span>
+    </a>
+<?php
+//echo activity_navigation($PAGE);
 echo '</div>';
 
-$PAGE->requires->js_amd_inline("
-require(['jquery'], function($) {
-    var height = $(window).height();;
-    var footernavheight = $('.course-footer-nav').height();
-    $('iframe').height(height - footernavheight);
-});");
-    echo $OUTPUT->footer();
+//$PAGE->requires->js_amd_inline("
+//require(['jquery'], function($) {
+//    var height = $(window).height();;
+//    var footernavheight = $('.course-footer-nav').height();
+//    $('iframe').height(height - footernavheight);
+//});");
+
+
+echo $OUTPUT->footer();
