@@ -110,7 +110,7 @@ frameborder="0"
 src="'.$webgl->index_file_url.'" ></iframe>';
 echo $iframe;
 ?>
-    <a href="/course/view.php?id=<?php echo $course->id;?>" style="position: absolute;left: 0;bottom: 0;background: #fff;padding: 12px;color: #424242;text-decoration: none;font-size: 15px;    border-radius: 4px;">
+    <a href="javascript:void(0)" onclick="history.back()" style="position: absolute;left: 0;bottom: 0;background: #fff;padding: 12px;color: #424242;text-decoration: none;font-size: 15px;    border-radius: 4px;">
         <i class="fas fa-arrow-left closed"></i>
         <span class="p-3">TILBAKE</span>
     </a>
