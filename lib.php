@@ -43,6 +43,7 @@ function webgl_supports(string $feature): ?bool
     switch($feature) {
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_MOD_INTRO:
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
             return true;
         case FEATURE_BACKUP_MOODLE2:
         case FEATURE_GRADE_HAS_GRADE:
