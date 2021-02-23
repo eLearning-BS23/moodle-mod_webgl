@@ -37,6 +37,12 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
     $zip = new \zip_packer();
     $filelist = $zip->extract_to_pathname($zipfilepath, $importtempdir);
     $dirname = array_key_first($filelist);
+
+    if (!is_dir($importtempdir . DIRECTORY_SEPARATOR . $dirname)) {
+        $dirnamearr = explode('/',$dirname);
+        $dirname = $dirnamearr[0].DIRECTORY_SEPARATOR;
+    }
+
     if (!is_dir($importtempdir . DIRECTORY_SEPARATOR . $dirname)) {
         // Missing required file.
         throw new \moodle_exception('invalidcontent', 'mod_webgl');
