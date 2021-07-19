@@ -56,36 +56,14 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
     }
 
     if ($webgl->storage_engine == 2){
-        $access_key = get_config('webgl','access_key');
-        $secret_key = get_config('webgl','secret_key');
-        $endpoint = get_config('webgl','endpoint');
-        $s3 = new S3($access_key,$secret_key,false,$endpoint);
-        $s3->setExceptions(true);
 
-        // Port of curl::__construct().
-        if (!empty($CFG->proxyhost)) {
-            if (empty($CFG->proxyport)) {
-                $proxyhost = $CFG->proxyhost;
-            } else {
-                $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
-            }
-            $proxytype = CURLPROXY_HTTP;
-            $proxyuser = null;
-            $proxypass = null;
-            if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
-                $proxyuser = $CFG->proxyuser;
-                $proxypass = $CFG->proxypassword;
-            }
-            if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
-                $proxytype = CURLPROXY_SOCKS5;
-            }
-            $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
-        }
-        $bucket = 'webgl-game';
+        $replacewith = cloudstoragewebglcontentprefix($webgl);
+        $bucket = $replacewith;
+        list($s3, $endpoint) = s3_create_bucket($bucket);
+
         foreach ($filelist as $filename => $value):
             $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
             if (!is_dir($cfile)) {
-                $replacewith = cloudstoragewebglcontentprefix($webgl);
                 $filename = str_replace_first($filename, '/', $replacewith);
                 $s3->putObject(S3::inputFile($cfile),$bucket,$endpoint.'/'.$filename,S3::ACL_PUBLIC_READ);
             }
@@ -197,6 +175,94 @@ function delete_container_blobs(stdClass $webgl){
     deleteBlobs($blobClient, $webgl);
 }
 
+/**
+ * @param $bucket
+ * @param string $visibility
+ * @return array
+ * @throws dml_exception
+ */
+function s3_create_bucket($bucket, string $visibility=S3::ACL_PRIVATE,$location="ap-southeast-1"){
+    list($s3, $endpoint) = get_s3_instance();
+    $s3->putBucket($bucket, $visibility, $location);
+    return [$s3, $endpoint];
+}
+
+/**
+ * @throws dml_exception
+ */
+function delete_s3_bucket(stdClass $webgl) {
+    list($s3, $endpoint) = get_s3_instance();
+    $bucket = cloudstoragewebglcontentprefix($webgl);
+    $objects =  $s3->getBucket($bucket);
+    foreach ($objects as $key => $object):
+       $s3->deleteObject($bucket,$key);
+    endforeach;
+    return $s3->deleteBucket($bucket);
+}
+
+/**
+ * @return array [S3, string]
+ * @throws dml_exception
+ */
+function get_s3_instance(){
+    $access_key = get_config('webgl','access_key');
+    $secret_key = get_config('webgl','secret_key');
+    $endpoint = get_config('webgl','endpoint');
+    $s3 = new S3($access_key,$secret_key,false,$endpoint);
+    $s3->setExceptions(true);
+
+    // Port of curl::__construct().
+    if (!empty($CFG->proxyhost)) {
+        if (empty($CFG->proxyport)) {
+            $proxyhost = $CFG->proxyhost;
+        } else {
+            $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
+        }
+        $proxytype = CURLPROXY_HTTP;
+        $proxyuser = null;
+        $proxypass = null;
+        if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
+            $proxyuser = $CFG->proxyuser;
+            $proxypass = $CFG->proxypassword;
+        }
+        if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
+            $proxytype = CURLPROXY_SOCKS5;
+        }
+        $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
+    }
+    return [$s3, $endpoint];
+}
+
+
+function upload_zip_file($webgl, $mform, $elname, $res)
+{
+    if ($webgl->store_zip_file) {
+
+        if ($webgl->storage_engine == 1) {
+            $zipcontent = $mform->get_file_content($elname);
+            import_zip_contents($webgl, $zipcontent);
+        } else {
+            list($s3, $endpoint) = get_s3_instance();
+
+            $prefix = cloudstoragewebglcontentprefix($webgl);
+            $bucket = $prefix;
+            $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
+            $s3->putObject(S3::inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
+                'Content-Type' => "application/octet-stream"
+            ]);
+        }
+    }
+}
+
+
+function index_file_url($webgl, $blobdatadetails) {
+    if ($webgl->storage_engine == 2){
+        $webgl->index_file_url = $blobdatadetails['index'];
+    }else{
+        $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
+    }
+    return $webgl;
+}
 /**
  * @param $haystack
  * @param $needle

@@ -70,60 +70,16 @@ function webgl_supports(string $feature): ?bool
 function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): int
 {
     global $DB;
-
-
-
     $elname = 'importfile';
     $webgl->webgl_file = $mform->get_new_filename('importfile');
     $webgl->timecreated = time();
     $webgl->id = $DB->insert_record('webgl', $webgl);
     $res = $mform->save_temp_file($elname);
     $blobdatadetails = import_extract_upload_contents($webgl, $res);
-    if ($webgl->storage_engine == 2){
-        $webgl->index_file_url = $blobdatadetails['index'];
-    }else{
-        $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
-    }
+    $webgl = index_file_url($webgl, $blobdatadetails);
     $DB->update_record('webgl', $webgl);
 
-    if ($webgl->storage_engine == 1){
-        if ($webgl->store_zip_file){
-            $zipcontent = $mform->get_file_content($elname);
-            import_zip_contents($webgl, $zipcontent);
-        }
-    }else{
-        $access_key = get_config('webgl','access_key');
-        $secret_key = get_config('webgl','secret_key');
-        $endpoint = get_config('webgl','endpoint');
-        $s3 = new S3($access_key,$secret_key,false,$endpoint);
-        $s3->setExceptions(true);
-
-        // Port of curl::__construct().
-        if (!empty($CFG->proxyhost)) {
-            if (empty($CFG->proxyport)) {
-                $proxyhost = $CFG->proxyhost;
-            } else {
-                $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
-            }
-            $proxytype = CURLPROXY_HTTP;
-            $proxyuser = null;
-            $proxypass = null;
-            if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
-                $proxyuser = $CFG->proxyuser;
-                $proxypass = $CFG->proxypassword;
-            }
-            if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
-                $proxytype = CURLPROXY_SOCKS5;
-            }
-            $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
-        }
-        $bucket = 'webgl-game';
-        $prefix = cloudstoragewebglcontentprefix($webgl);
-        $filename =  $prefix.DIRECTORY_SEPARATOR.$webgl->webgl_file;
-        S3::putObject(S3::inputFile($res),$bucket, $endpoint.'/'.$filename, S3::ACL_PUBLIC_READ,[
-            'Content-Type' => "application/octet-stream"
-        ]);
-    }
+    upload_zip_file($webgl, $mform, $elname, $res);
 
 
     if ($res){
@@ -158,13 +114,12 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
     if ($basefilename){
         $res = $mform->save_temp_file('importfile');
         $blobdatadetails = import_extract_upload_contents($webgl, $res);
-        $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
+        $webgl = index_file_url($webgl, $blobdatadetails);
+
         $webgl->webgl_file = $basefilename;
 
-        if ($webgl->store_zip_file){
-            $zipcontent = $mform->get_file_content($elname);
-            import_zip_contents($webgl, $zipcontent);
-        }
+        upload_zip_file($webgl, $mform, $elname, $res);
+
 
         if ($res){
             @unlink($res);
@@ -231,7 +186,11 @@ function webgl_delete_instance($id): bool
     // Delete any dependent records here.
 
     $DB->delete_records('webgl', array('id' => $webgl->id));
-    delete_container_blobs($webgl);
+    if ($webgl->storage_engine == 2){
+        delete_s3_bucket($webgl);
+    }else{
+        delete_container_blobs($webgl);
+    }
 //    webgl_grade_item_delete($webgl);
 
     return true;
