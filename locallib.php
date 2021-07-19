@@ -54,7 +54,48 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
         // Missing required file.
         throw new \moodle_exception('errorimport', 'mod_webgl');
     }
+
+    if ($webgl->storage_engine == 2){
+        $access_key = get_config('webgl','access_key');
+        $secret_key = get_config('webgl','secret_key');
+        $endpoint = get_config('webgl','endpoint');
+        $s3 = new S3($access_key,$secret_key,false,$endpoint);
+        $s3->setExceptions(true);
+
+        // Port of curl::__construct().
+        if (!empty($CFG->proxyhost)) {
+            if (empty($CFG->proxyport)) {
+                $proxyhost = $CFG->proxyhost;
+            } else {
+                $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
+            }
+            $proxytype = CURLPROXY_HTTP;
+            $proxyuser = null;
+            $proxypass = null;
+            if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
+                $proxyuser = $CFG->proxyuser;
+                $proxypass = $CFG->proxypassword;
+            }
+            if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
+                $proxytype = CURLPROXY_SOCKS5;
+            }
+            $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
+        }
+        $bucket = 'webgl-game';
+        foreach ($filelist as $filename => $value):
+            $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
+            if (!is_dir($cfile)) {
+                $replacewith = cloudstoragewebglcontentprefix($webgl);
+                $filename = str_replace_first($filename, '/', $replacewith);
+                $s3->putObject(S3::inputFile($cfile),$bucket,$endpoint.'/'.$filename,S3::ACL_PUBLIC_READ);
+            }
+        endforeach;
+        return ['index' => "https://$bucket.$endpoint/".$endpoint.'/'. cloudstoragewebglcontentprefix($webgl).'/index.html'];
+    }else{
+
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+
+
 
     foreach ($filelist as $filename => $value):
         $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
@@ -70,7 +111,49 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
         }
     endforeach;
     return listBlobs($blobClient, $webgl);
+    }
+
 }
+
+//function import_extract_upload_contents_s3(stdClass $webgl, string $zipfilepath) : array {
+//
+//
+//    $access_key = get_config('webgl','access_key');
+//    $secret_key = get_config('webgl','secret_key');
+//    $endpoint = get_config('webgl','endpoint');
+//    $s3 = new S3($access_key,$secret_key,false,$endpoint);
+//    $s3->setExceptions(true);
+//
+//    // Port of curl::__construct().
+//    if (!empty($CFG->proxyhost)) {
+//        if (empty($CFG->proxyport)) {
+//            $proxyhost = $CFG->proxyhost;
+//        } else {
+//            $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
+//        }
+//        $proxytype = CURLPROXY_HTTP;
+//        $proxyuser = null;
+//        $proxypass = null;
+//        if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
+//            $proxyuser = $CFG->proxyuser;
+//            $proxypass = $CFG->proxypassword;
+//        }
+//        if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
+//            $proxytype = CURLPROXY_SOCKS5;
+//        }
+//        $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
+//    }
+//    foreach ($filelist as $filename => $value):
+//        $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
+//        if (!is_dir($cfile)) {
+//            $replacewith = cloudstoragewebglcontentprefix($webgl);
+//            $filename = str_replace_first($filename, '/', $replacewith);
+//            $s3->putObject(S3::inputFile($cfile),'webgl-game',$endpoint.'/'.$filename);
+//        }
+//    endforeach;
+//
+//    return listBlobs($blobClient, $webgl);
+//}
 
 /**
  * Extracts the imported zip contents.

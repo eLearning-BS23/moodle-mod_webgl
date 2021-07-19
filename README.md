@@ -37,4 +37,4 @@ php composer.phar install
 ```
 
 ## Plugin Settings 
-![img.png](img.png)
+![img.png](assets/img.png)

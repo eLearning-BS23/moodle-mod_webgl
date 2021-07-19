@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AWS webgl module version info
+ * mod webgl module version info
  *
  * @package mod_webgl
  * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}

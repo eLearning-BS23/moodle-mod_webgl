@@ -17,7 +17,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 
 /**
- * The mod_newmodule instance list viewed event.
+ * The mod_webgl instance list viewed event.
  *
  * @package mod_webgl
  * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}

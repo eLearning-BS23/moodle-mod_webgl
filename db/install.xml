@@ -13,9 +13,16 @@
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" COMMENT="Format of the intro field (MOODLE, HTML, MARKDOWN...)"/>
 
         <FIELD NAME="webgl_file" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Uploaded WebGL File Name"/>
-        <FIELD NAME="account_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Account Name"/>
-        <FIELD NAME="account_key" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Account Key"/>
-        <FIELD NAME="container_name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Azure BLOB storage Container name"/>
+        <FIELD NAME="storage_engine" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="storage engine : Azure BLOB, AWS S3"/>
+
+        <FIELD NAME="account_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Account Name"/>
+        <FIELD NAME="account_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Account Key"/>
+        <FIELD NAME="container_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Azure BLOB storage Container name"/>
+
+        <FIELD NAME="access_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="S3 Access key"/>
+        <FIELD NAME="secret_key" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="S3 secret key"/>
+        <FIELD NAME="endpoint" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="S3 endpoint"/>
+
         <FIELD NAME="store_zip_file" TYPE="char" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Also upload Uploaded zip file to Azure Blob storage"/>
         <FIELD NAME="index_file_url" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="webgl index file url"/>
         <FIELD NAME="iframe_height" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="iframe height"/>

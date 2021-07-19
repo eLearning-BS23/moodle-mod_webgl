@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AWS webgl module version info
+ * webgl module language file
  *
  * @package mod_appstream
  * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
@@ -44,6 +44,27 @@ $string['account_key_help'] = 'When you create a storage account, Azure generate
 
 $string['container_name'] = 'Blob storage container';
 $string['container_name_help'] = 'Azure Blob Storage helps you create data lakes for your analytics needs, and provides storage to build powerful cloud-native and mobile apps. Optimize costs with tiered storage for your long-term data, and flexibly scale up for high-performance computing and machine learning workloads.';
+
+
+$string['access_key'] = 'AWS access key';
+$string['access_key_help'] = 'AWS access key';
+
+$string['secret_key'] = 'AWS secret_key';
+$string['secret_key_help'] = 'AWS secret_key';
+
+$string['storage_engine'] = 'Storage Engine';
+$string['storage_engine_help'] = 'Storage Engine: Webgl provide 2 kind of storage. Azure BLOB storage, AWS S3. Pick suitable one';
+
+$string['account_name_error'] = 'Account name should not be empty while storage engine is Azure BLOB storage.';
+$string['account_key_error'] = 'Account key should not be empty while storage engine is Azure BLOB storage.';
+$string['container_name_error'] = 'Container name should not be empty while storage engine is Azure BLOB storage.';
+
+$string['access_key_error'] = 'Access key should not be empty while storage engine is AWS s3.';
+$string['secret_key_error'] = 'Secret key should not be empty while storage engine is AWS s3.';
+$string['endpoint_error'] = 'Endpoint should not be empty while storage engine is AWS s3.';
+
+$string['endpoint'] = 'S3 endpoint';
+$string['endpoint_help'] = 'AWS s3 endpoint';
 
 $string['store_zip_file'] = 'Upload zip file';
 $string['store_zip_file_help'] = 'Also upload Uploaded zip file to Azure Blob storage.';
