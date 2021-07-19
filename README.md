@@ -3,7 +3,7 @@
 
 # Getting Started
 
-## Dependency: S3 repository````
+## Dependency: S3 repository
 
 ## Minimum Requirements
 

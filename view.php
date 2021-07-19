@@ -23,6 +23,8 @@
  */
 
 
+use core_course\output\activity_navigation;
+
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/lib.php');
 require_once(dirname(__FILE__) . '/classes/BlobStorage.php');
@@ -109,21 +111,69 @@ height="100%"
 frameborder="0"
 src="'.$webgl->index_file_url.'" ></iframe>';
 echo $iframe;
+
+
+// Get a list of all the activities in the course.
+$modules = get_fast_modinfo($course->id)->get_cms();
+
+// Put the modules into an array in order by the position they are shown in the course.
+$mods = [];
+$activitylist = [];
+foreach ($modules as $module) {
+    // Only add activities the user can access, aren't in stealth mode and have a url (eg. mod_label does not).
+    if (!$module->uservisible || $module->is_stealth() || empty($module->url)) {
+        continue;
+    }
+    $mods[$module->id] = $module;
+
+    // No need to add the current module to the list for the activity dropdown menu.
+    if ($module->id == $cm->id) {
+        continue;
+    }
+    // Module name.
+    $modname = $module->get_formatted_name();
+    // Display the hidden text if necessary.
+    if (!$module->visible) {
+        $modname .= ' ' . get_string('hiddenwithbrackets');
+    }
+    // Module URL.
+    $linkurl = new moodle_url($module->url, array('forceview' => 1));
+    // Add module URL (as key) and name (as value) to the activity list array.
+    $activitylist[$linkurl->out(false)] = $modname;
+}
+
+$nummods = count($mods);
+
+// If there is only one mod then do nothing.
+if ($nummods == 1) {
+    return '';
+}
+
+// Get an array of just the course module ids used to get the cmid value based on their position in the course.
+$modids = array_keys($mods);
+
+// Get the position in the array of the course module we are viewing.
+$position = array_search($cm->id, $modids);
+
+$prevmod = null;
+$nextmod = null;
+
+// Check if we have a previous mod to show.
+if ($position > 0) {
+    $prevmod = $mods[$modids[$position - 1]];
+}
+
+// Check if we have a next mod to show.
+if ($position < ($nummods - 1)) {
+    $nextmod = $mods[$modids[$position + 1]];
+}
+
+$activitynav = new activity_navigation($prevmod, $nextmod, $activitylist);
+$renderer = $PAGE->get_renderer('core', 'course');
 ?>
-    <a href="javascript:void(0)" onclick="history.back()" style="position: absolute;left: 0;bottom: 0;background: #fff;padding: 12px;color: #424242;text-decoration: none;font-size: 15px;    border-radius: 4px;">
-        <i class="fas fa-arrow-left closed"></i>
-        <span class="p-3">TILBAKE</span>
-    </a>
+    <div  onclick="history.back()" style="position: absolute;left: 0;width:100%; height:30px;bottom: 0;background: #fff;padding: 12px;color: #424242;text-decoration: none;font-size: 15px;    border-radius: 4px;">
+        <?php echo $renderer->render($activitynav); ?>
+    </div>
 <?php
-//echo activity_navigation($PAGE);
 echo '</div>';
-
-//$PAGE->requires->js_amd_inline("
-//require(['jquery'], function($) {
-//    var height = $(window).height();;
-//    var footernavheight = $('.course-footer-nav').height();
-//    $('iframe').height(height - footernavheight);
-//});");
-
-
 echo $OUTPUT->footer();
