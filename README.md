@@ -2,6 +2,9 @@
 
 
 # Getting Started
+
+## Dependency: S3 repository````
+
 ## Minimum Requirements
 
 * Moodle 3.8 or higher
@@ -38,3 +41,9 @@ php composer.phar install
 
 ## Plugin Settings 
 ![img.png](assets/img.png)
+
+## choose webgl activity
+![activity-selection.png](assets/activity-selection.png) 
+
+## WebGL form
+![webgl-from.png](assets/webgl-from.png) 
