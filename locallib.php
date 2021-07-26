@@ -51,7 +51,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
 
         $replacewith = cloudstoragewebglcontentprefix($webgl);
         $bucket = $replacewith;
-        list($s3, $endpoint) = s3_create_bucket($bucket);
+        list($s3, $endpoint, $bucket) = s3_create_bucket($bucket);
 
         foreach ($filelist as $filename => $value):
             $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
@@ -143,7 +143,7 @@ function s3_create_bucket(string $bucket, string $visibility=S3::ACL_PRIVATE, st
     }
     list($s3, $endpoint) = get_s3_instance();
     $s3->putBucket($bucket, $visibility, $location);
-    return [$s3, $endpoint];
+    return [$s3, $endpoint, $bucket];
 }
 
 /**
