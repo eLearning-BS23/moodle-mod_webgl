@@ -44,8 +44,14 @@ php composer.phar install
 ## Plugin Settings 
 ![img.png](assets/img.png)
 
-## choose webgl activity
+## Choose WebGL Activity
 ![activity-selection.png](assets/activity-selection.png) 
 
-## WebGL form
+## WebGL Add Form
 ![webgl-from.png](assets/webgl-from.png) 
+
+## WebGL Edit Form
+![webgl-from.png](assets/edit-webgl.png) 
+
+## WebGL Game View
+![webgl-from.png](assets/webgl-view.png) 
