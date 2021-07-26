@@ -11,7 +11,17 @@ require_once 'classes/BlobStorage.php';
  */
 function cloudstoragewebglcontentprefix(stdClass $webgl){
     $hostname = gethostname();
-    return "$hostname-course-$webgl->course"."-module-id-$webgl->id";
+    $bucket =  "$hostname-course-$webgl->course"."-module-id-$webgl->id";
+    $bucket = strtolower($bucket);
+    $bucket = str_replace('_', '-',$bucket);
+    $bucket_length = strlen($bucket);
+    if( $bucket_length < 3){
+        $bucket .= random_string(10);
+    }elseif($bucket_length>63){
+        $excited_length = $bucket_length - 63;
+        $bucket = substr_replace($bucket,"", rand(15,20), $excited_length);
+    }
+    return $bucket;
 }
 
 /**
@@ -51,7 +61,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
 
         $replacewith = cloudstoragewebglcontentprefix($webgl);
         $bucket = $replacewith;
-        list($s3, $endpoint, $bucket) = s3_create_bucket($bucket);
+        list($s3, $endpoint) = s3_create_bucket($bucket);
 
         foreach ($filelist as $filename => $value):
             $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
@@ -132,8 +142,6 @@ function delete_container_blobs(stdClass $webgl){
  */
 function s3_create_bucket(string $bucket, string $visibility=S3::ACL_PRIVATE, string $location=mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
 {
-    $bucket = strtolower($bucket);
-    $bucket = str_replace('_', '-',$bucket);
     $bucket_length = strlen($bucket);
     if( $bucket_length < 3){
         $bucket .= random_string(10);
@@ -143,7 +151,7 @@ function s3_create_bucket(string $bucket, string $visibility=S3::ACL_PRIVATE, st
     }
     list($s3, $endpoint) = get_s3_instance();
     $s3->putBucket($bucket, $visibility, $location);
-    return [$s3, $endpoint, $bucket];
+    return [$s3, $endpoint];
 }
 
 /**
