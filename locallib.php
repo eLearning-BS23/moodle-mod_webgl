@@ -132,6 +132,8 @@ function delete_container_blobs(stdClass $webgl){
  */
 function s3_create_bucket(string $bucket, string $visibility=S3::ACL_PRIVATE, string $location=mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
 {
+    $bucket = strtolower($bucket);
+    $bucket = str_replace('_', '-',$bucket);
     $bucket_length = strlen($bucket);
     if( $bucket_length < 3){
         $bucket .= random_string(10);
