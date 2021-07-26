@@ -14,6 +14,11 @@ require_once($CFG->dirroot . '/course/moodleform_mod.php');
 
 class mod_webgl_mod_form extends moodleform_mod
 {
+    const STORAGE_ENGINE_AZURE = 1;
+
+    const STORAGE_ENGINE_S3 = 2;
+
+    const STORAGE_ENGINE_S3_DEFAULT_LOCATION = 'ap-southeast-1';
 
     public function definition()
     {
@@ -195,7 +200,7 @@ class mod_webgl_mod_form extends moodleform_mod
     public function validation($data, $files)
     {
         $error = [];
-        if ($data['storage_engine'] == 1){
+        if ($data['storage_engine'] == self::STORAGE_ENGINE_AZURE){
             if ( empty($data['account_name']) ) {
                 $error['account_name'] = get_string('account_name_error','mod_webgl');
             }
@@ -205,7 +210,7 @@ class mod_webgl_mod_form extends moodleform_mod
             if ( empty($data['container_name']) ) {
                 $error['container_name'] = get_string('container_name_error','mod_webgl');
             }
-        }elseif ($data['storage_engine'] == 2){
+        }elseif ($data['storage_engine'] == self::STORAGE_ENGINE_S3){
             if ( empty($data['access_key']) ) {
                 $error['access_key'] = get_string('access_key_error','mod_webgl');
             }

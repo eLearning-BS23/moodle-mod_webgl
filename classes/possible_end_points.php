@@ -1,5 +1,7 @@
 <?php
+
 defined('MOODLE_INTERNAL') || die();
+
 return [
     // List of possible Amazon S3 Endpoints.
     "s3.amazonaws.com" => "s3.amazonaws.com",

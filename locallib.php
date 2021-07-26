@@ -1,16 +1,8 @@
 <?php
 
-/**
- * Extracts the import zip contents.
- *
- * @param string $zipfilepath Zip file path
- * @param string $basefilename
- * @return array [0] => \stdClass, [1] => string
- * @throws moodle_exception
- */
-
 
 require_once 'classes/BlobStorage.php';
+
 
 /**
  * Make prefix webgl blob file name.
@@ -34,7 +26,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
 
     $importtempdir = make_request_directory('webglcontentimport' . microtime(false));
 
-    $zip = new \zip_packer();
+    $zip = new zip_packer();
     $filelist = $zip->extract_to_pathname($zipfilepath, $importtempdir);
     $dirname = array_key_first($filelist);
 
@@ -45,17 +37,17 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
 
     if (!is_dir($importtempdir . DIRECTORY_SEPARATOR . $dirname)) {
         // Missing required file.
-        throw new \moodle_exception('invalidcontent', 'mod_webgl');
+        throw new moodle_exception('invalidcontent', 'mod_webgl');
     }
 
     $indexfile = $dirname . 'index.html';
 
     if (!in_array($indexfile, $filelist)) {
         // Missing required file.
-        throw new \moodle_exception('errorimport', 'mod_webgl');
+        throw new moodle_exception('errorimport', 'mod_webgl');
     }
 
-    if ($webgl->storage_engine == 2){
+    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3){
 
         $replacewith = cloudstoragewebglcontentprefix($webgl);
         $bucket = $replacewith;
@@ -93,45 +85,6 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
 
 }
 
-//function import_extract_upload_contents_s3(stdClass $webgl, string $zipfilepath) : array {
-//
-//
-//    $access_key = get_config('webgl','access_key');
-//    $secret_key = get_config('webgl','secret_key');
-//    $endpoint = get_config('webgl','endpoint');
-//    $s3 = new S3($access_key,$secret_key,false,$endpoint);
-//    $s3->setExceptions(true);
-//
-//    // Port of curl::__construct().
-//    if (!empty($CFG->proxyhost)) {
-//        if (empty($CFG->proxyport)) {
-//            $proxyhost = $CFG->proxyhost;
-//        } else {
-//            $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
-//        }
-//        $proxytype = CURLPROXY_HTTP;
-//        $proxyuser = null;
-//        $proxypass = null;
-//        if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
-//            $proxyuser = $CFG->proxyuser;
-//            $proxypass = $CFG->proxypassword;
-//        }
-//        if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
-//            $proxytype = CURLPROXY_SOCKS5;
-//        }
-//        $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
-//    }
-//    foreach ($filelist as $filename => $value):
-//        $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
-//        if (!is_dir($cfile)) {
-//            $replacewith = cloudstoragewebglcontentprefix($webgl);
-//            $filename = str_replace_first($filename, '/', $replacewith);
-//            $s3->putObject(S3::inputFile($cfile),'webgl-game',$endpoint.'/'.$filename);
-//        }
-//    endforeach;
-//
-//    return listBlobs($blobClient, $webgl);
-//}
 
 /**
  * Extracts the imported zip contents.
@@ -152,18 +105,13 @@ function import_zip_contents(stdClass $webgl, string $content) : void {
 /**
  * @param stdClass $webgl
  * @return void
+ * @throws coding_exception
+ * @throws moodle_exception
  */
 function download_container_blobs(stdClass $webgl): void
 {
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
-//    $zipper   = get_file_packer('application/zip');
-//    $temppath = make_request_directory() .DIRECTORY_SEPARATOR. $webgl->webgl_file;
-    $files = downloadBlobs($blobClient, $webgl);
-//    if ($zipper->archive_to_pathname($files, $temppath)) {
-//        send_temp_file($temppath, $webgl->webgl_file);
-//    } else {
-//        print_error('cannotdownloaddir', 'repository');
-//    }
+    downloadBlobs($blobClient, $webgl);
 }
 
 /**
@@ -178,10 +126,12 @@ function delete_container_blobs(stdClass $webgl){
 /**
  * @param $bucket
  * @param string $visibility
+ * @param string $location
  * @return array
  * @throws dml_exception
  */
-function s3_create_bucket($bucket, string $visibility=S3::ACL_PRIVATE,$location="ap-southeast-1"){
+function s3_create_bucket($bucket, string $visibility=S3::ACL_PRIVATE, string $location=mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
+{
     list($s3, $endpoint) = get_s3_instance();
     $s3->putBucket($bucket, $visibility, $location);
     return [$s3, $endpoint];
@@ -201,7 +151,7 @@ function delete_s3_bucket(stdClass $webgl) {
 }
 
 /**
- * @return array [S3, string]
+ * @return array
  * @throws dml_exception
  */
 function get_s3_instance(){
@@ -254,9 +204,13 @@ function upload_zip_file($webgl, $mform, $elname, $res)
     }
 }
 
-
+/**
+ * @param $webgl
+ * @param $blobdatadetails
+ * @return mixed
+ */
 function index_file_url($webgl, $blobdatadetails) {
-    if ($webgl->storage_engine == 2){
+    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3){
         $webgl->index_file_url = $blobdatadetails['index'];
     }else{
         $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
@@ -277,6 +231,12 @@ function str_replace_first($haystack, $needle, $replace)
     }
 }
 
+/**
+ * @param $PAGE
+ * @return string
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
 function  activity_navigation($PAGE) {
     global $CFG;
     // First we should check if we want to add navigation.

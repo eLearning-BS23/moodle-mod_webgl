@@ -25,9 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 const BS_WEBGL_INDEX = 'bs_webgl_index';
+
 const AZURE_BLOB_DEFAULT_CONTENT_TYPE = 'text/plain';
 
 require_once 'locallib.php';
+
 require_once $CFG->dirroot.'/repository/s3/S3.php';
 
 /**

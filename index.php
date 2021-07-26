@@ -9,6 +9,8 @@
  */
 
 
+use mod_webgl\event\course_module_instance_list_viewed;
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
@@ -21,7 +23,7 @@ require_course_login($course);
 $params = array(
     'context' => context_course::instance($course->id)
 );
-$event = \mod_webgl\event\course_module_instance_list_viewed::create($params);
+$event = course_module_instance_list_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 

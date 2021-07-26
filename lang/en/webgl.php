@@ -31,6 +31,8 @@ $string['ziparchive_help'] = 'Select a zip file containing index.html, index.liq
 $string['content_advcheckbox'] = 'Update WebGL content too';
 $string['content_advcheckbox_help'] = 'If enabled,you can also update the WebGL content';
 
+$string['download_exception'] = 'You must specify a course_module ID or an instance ID';
+
 
 ///////////////////////////////////
 //BEGIN: Fields in the admin form//

@@ -1,4 +1,6 @@
-# Moodle WebGL Activity plugin with Azure Blob storage WebGL content Upload
+# Moodle WebGL Activity plugin with 
+ - Azure Blob storage WebGL content Upload
+ - AWS S3 WebGL content Upload
 
 
 # Getting Started
