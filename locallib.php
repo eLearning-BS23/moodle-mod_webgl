@@ -124,14 +124,21 @@ function delete_container_blobs(stdClass $webgl){
 }
 
 /**
- * @param $bucket
+ * @param string $bucket
  * @param string $visibility
  * @param string $location
  * @return array
  * @throws dml_exception
  */
-function s3_create_bucket($bucket, string $visibility=S3::ACL_PRIVATE, string $location=mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
+function s3_create_bucket(string $bucket, string $visibility=S3::ACL_PRIVATE, string $location=mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
 {
+    $bucket_length = strlen($bucket);
+    if( $bucket_length < 3){
+        $bucket .= random_string(10);
+    }elseif($bucket_length>63){
+        $excited_length = $bucket_length - 63;
+        $bucket = substr_replace($bucket,"", rand(15,20), $excited_length);
+    }
     list($s3, $endpoint) = get_s3_instance();
     $s3->putBucket($bucket, $visibility, $location);
     return [$s3, $endpoint];
