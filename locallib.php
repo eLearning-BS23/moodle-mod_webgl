@@ -84,21 +84,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
         $bucket = $replacewith;
 
-        list($s3, $endpoint) = s3_create_bucket($webgl, $bucket);
-
-        foreach ($filelist as $filename => $value):
-
-            $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
-
-            if (!is_dir($cfile)) {
-
-                $filename = str_replace_first($filename, '/', $replacewith);
-
-                $s3->putObject($s3->inputFile($cfile), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ);
-
-            }
-
-        endforeach;
+        $endpoint = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir, $replacewith);
 
         return ['index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . cloudstoragewebglcontentprefix($webgl) . '/index.html'];
     }
@@ -135,6 +121,35 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
         return listBlobs($blobClient, $webgl);
     }
 
+}
+
+/**
+ * @param stdClass $webgl
+ * @param string $bucket
+ * @param $filelist
+ * @param $importtempdir
+ * @param string $replacewith
+ * @return mixed
+ * @throws dml_exception
+ */
+function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir, string $replacewith)
+{
+    list($s3, $endpoint) = s3_create_bucket($webgl, $bucket);
+
+    foreach ($filelist as $filename => $value):
+
+        $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
+
+        if (!is_dir($cfile)) {
+
+            $filename = str_replace_first($filename, '/', $replacewith);
+
+            $s3->putObject($s3->inputFile($cfile), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ);
+
+        }
+
+    endforeach;
+    return $endpoint;
 }
 
 
@@ -320,7 +335,7 @@ function upload_zip_file($webgl, $mform, $elname, $res)
 
             $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
 
-            $s3->putObject(S3::inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
+            $s3->putObject($s3->inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
                 'Content-Type' => "application/octet-stream"
             ]);
 
