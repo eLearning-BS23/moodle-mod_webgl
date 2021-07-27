@@ -2,6 +2,7 @@
 
 
 require_once 'classes/BlobStorage.php';
+require_once 'mod_form.php';
 
 
 
