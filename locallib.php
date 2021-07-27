@@ -155,7 +155,7 @@ function upload_zip_file($webgl, $mform, $elname, $res)
  * @return array
  * @throws dml_exception
  */
-function get_s3_instance(stdClass $webgl)
+function get_s3_instance(stdClass $webgl, $exception_enabled=true)
 {
     $access_key = empty($webgl->access_key) ? $webgl->access_key :  get_config('webgl', 'access_key');
 
@@ -165,7 +165,7 @@ function get_s3_instance(stdClass $webgl)
 
     $s3 = new S3($access_key, $secret_key, false, $endpoint);
 
-    $s3->setExceptions(true);
+    $s3->setExceptions($exception_enabled);
 
     // Port of curl::__construct().
     if (!empty($CFG->proxyhost)) {
@@ -249,7 +249,7 @@ function cloudstoragewebglcontentprefix(stdClass $webgl)
  */
 function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = S3::ACL_PRIVATE, string $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
 {
-    list($s3, $endpoint) = get_s3_instance($webgl);
+    list($s3, $endpoint) = get_s3_instance($webgl, false);
 
     $bucket_object_removed = make_empty_s3_bucket($s3, $bucket);
 
@@ -268,7 +268,7 @@ function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = 
  */
 function delete_s3_bucket(stdClass $webgl)
 {
-    list($s3, $endpoint) = get_s3_instance($webgl);
+    list($s3, $endpoint) = get_s3_instance($webgl, false);
 
     $bucket = cloudstoragewebglcontentprefix($webgl);
 
@@ -284,23 +284,20 @@ function delete_s3_bucket(stdClass $webgl)
  */
 function make_empty_s3_bucket(S3 $s3, string $bucket){
 
-    try {
         $objects = $s3->getBucket($bucket);
 
-        foreach ($objects as $key => $object):
+        if (is_array($objects)){
+            foreach ($objects as $key => $object):
 
-            $s3->deleteObject($bucket, $key);
+                $s3->deleteObject($bucket, $key);
 
-        endforeach;
+            endforeach;
 
-        // Bucket exists
-        return is_array($objects);
+            // Bucket exists
+            return true;
+        }
 
-    }catch (Exception $exception){
-        // keep silent if no bucket
-    }
-
-    return false;
+        return false;
 
 }
 
