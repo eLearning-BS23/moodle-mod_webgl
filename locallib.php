@@ -67,7 +67,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
             $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
             if (!is_dir($cfile)) {
                 $filename = str_replace_first($filename, '/', $replacewith);
-                $s3->putObject(S3::inputFile($cfile),$bucket,$endpoint.'/'.$filename,S3::ACL_PUBLIC_READ);
+                $s3->putObject($s3->inputFile($cfile),$bucket,$endpoint.'/'.$filename,S3::ACL_PUBLIC_READ);
             }
         endforeach;
         return ['index' => "https://$endpoint/"."$bucket/".$endpoint.'/'. cloudstoragewebglcontentprefix($webgl).'/index.html'];
