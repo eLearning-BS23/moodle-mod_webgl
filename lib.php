@@ -188,7 +188,7 @@ function webgl_delete_instance($id): bool
     // Delete any dependent records here.
 
     $DB->delete_records('webgl', array('id' => $webgl->id));
-    if ($webgl->storage_engine == 2){
+    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3){
         delete_s3_bucket($webgl);
     }else{
         delete_container_blobs($webgl);

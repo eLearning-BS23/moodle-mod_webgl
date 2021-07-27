@@ -9,18 +9,32 @@ require_once 'classes/BlobStorage.php';
  * @param stdClass $webgl
  * @return string
  */
-function cloudstoragewebglcontentprefix(stdClass $webgl){
+function cloudstoragewebglcontentprefix(stdClass $webgl)
+{
     $hostname = gethostname();
-    $bucket =  "$hostname-course-$webgl->course"."-module-id-$webgl->id";
+
+    $bucket = "$hostname-course-$webgl->course" . "-module-id-$webgl->id";
+
     $bucket = strtolower($bucket);
-    $bucket = str_replace('_', '-',$bucket);
+
+    $bucket = str_replace('_', '-', $bucket);
+
+    $bucket = str_replace('.', '-', $bucket);
+
     $bucket_length = strlen($bucket);
-    if( $bucket_length < 3){
+
+    if ($bucket_length < 3) {
+
         $bucket .= random_string(10);
-    }elseif($bucket_length>63){
+
+    } elseif ($bucket_length > 63) {
+
         $excited_length = $bucket_length - 63;
-        $bucket = substr_replace($bucket,"", rand(15,20), $excited_length);
+
+        $bucket = substr_replace($bucket, "", rand(15, 20), $excited_length);
+
     }
+
     return $bucket;
 }
 
@@ -32,17 +46,23 @@ function cloudstoragewebglcontentprefix(stdClass $webgl){
  * @return array List of imported files.
  * @throws moodle_exception
  */
-function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : array {
+function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): array
+{
 
     $importtempdir = make_request_directory('webglcontentimport' . microtime(false));
 
     $zip = new zip_packer();
+
     $filelist = $zip->extract_to_pathname($zipfilepath, $importtempdir);
+
     $dirname = array_key_first($filelist);
 
     if (!is_dir($importtempdir . DIRECTORY_SEPARATOR . $dirname)) {
-        $dirnamearr = explode('/',$dirname);
-        $dirname = $dirnamearr[0].DIRECTORY_SEPARATOR;
+
+        $dirnamearr = explode('/', $dirname);
+
+        $dirname = $dirnamearr[0] . DIRECTORY_SEPARATOR;
+
     }
 
     if (!is_dir($importtempdir . DIRECTORY_SEPARATOR . $dirname)) {
@@ -57,40 +77,62 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
         throw new moodle_exception('errorimport', 'mod_webgl');
     }
 
-    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3){
+    // Upload to S3
+    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
 
         $replacewith = cloudstoragewebglcontentprefix($webgl);
+
         $bucket = $replacewith;
+
         list($s3, $endpoint) = s3_create_bucket($bucket);
 
         foreach ($filelist as $filename => $value):
+
             $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
+
             if (!is_dir($cfile)) {
+
                 $filename = str_replace_first($filename, '/', $replacewith);
-                $s3->putObject($s3->inputFile($cfile),$bucket,$endpoint.'/'.$filename,S3::ACL_PUBLIC_READ);
+
+                $s3->putObject($s3->inputFile($cfile), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ);
+
             }
+
         endforeach;
-        return ['index' => "https://$endpoint/"."$bucket/".$endpoint.'/'. cloudstoragewebglcontentprefix($webgl).'/index.html'];
-    }else{
 
-    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+        return ['index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . cloudstoragewebglcontentprefix($webgl) . '/index.html'];
+    }
+    // Upload to Azure Blob storage.
+    else {
 
+        $blobClient = getConnection($webgl->account_name, $webgl->account_key);
 
+        foreach ($filelist as $filename => $value):
 
-    foreach ($filelist as $filename => $value):
-        $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
-        if (!is_dir($cfile)) {
-            $replacewith = cloudstoragewebglcontentprefix($webgl);
-            $filename = str_replace_first($filename, '/', $replacewith);
-            $contetnttype = mime_content_type($cfile);
-            $content = fopen($cfile, "r");
-            uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
-            if (is_resource($content)) {
-                fclose($content);
+            $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
+
+            if (!is_dir($cfile)) {
+
+                $replacewith = cloudstoragewebglcontentprefix($webgl);
+
+                $filename = str_replace_first($filename, '/', $replacewith);
+
+                $contetnttype = mime_content_type($cfile);
+
+                $content = fopen($cfile, "r");
+
+                uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
+
+                if (is_resource($content)) {
+
+                    fclose($content);
+
+                }
             }
-        }
-    endforeach;
-    return listBlobs($blobClient, $webgl);
+
+        endforeach;
+
+        return listBlobs($blobClient, $webgl);
     }
 
 }
@@ -103,10 +145,14 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
  * @param string $content
  * @return void
  */
-function import_zip_contents(stdClass $webgl, string $content) : void {
+function import_zip_contents(stdClass $webgl, string $content): void
+{
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+
     $prefix = cloudstoragewebglcontentprefix($webgl);
-    $filename =  $prefix.DIRECTORY_SEPARATOR.$webgl->webgl_file;
+
+    $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
+
     $contetnttype = "application/octet-stream";
 
     uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
@@ -128,7 +174,8 @@ function download_container_blobs(stdClass $webgl): void
  * Delete azure blob container content.
  * @param stdClass $webgl
  */
-function delete_container_blobs(stdClass $webgl){
+function delete_container_blobs(stdClass $webgl)
+{
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
     deleteBlobs($blobClient, $webgl);
 }
@@ -140,42 +187,73 @@ function delete_container_blobs(stdClass $webgl){
  * @return array
  * @throws dml_exception
  */
-function s3_create_bucket(string $bucket, string $visibility=S3::ACL_PRIVATE, string $location=mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
+function s3_create_bucket(string $bucket, string $visibility = S3::ACL_PRIVATE, string $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
 {
-    $bucket_length = strlen($bucket);
-    if( $bucket_length < 3){
-        $bucket .= random_string(10);
-    }elseif($bucket_length>63){
-        $excited_length = $bucket_length - 63;
-        $bucket = substr_replace($bucket,"", rand(15,20), $excited_length);
-    }
     list($s3, $endpoint) = get_s3_instance();
-    $s3->putBucket($bucket, $visibility, $location);
+
+    $bucket_object_removed = make_empty_s3_bucket($s3, $bucket);
+
+    if (!$bucket_object_removed){
+
+        $s3->putBucket($bucket, $visibility, $location);
+
+    }
+
+
     return [$s3, $endpoint];
 }
 
 /**
  * @throws dml_exception
  */
-function delete_s3_bucket(stdClass $webgl) {
+function delete_s3_bucket(stdClass $webgl)
+{
     list($s3, $endpoint) = get_s3_instance();
+
     $bucket = cloudstoragewebglcontentprefix($webgl);
-    $objects =  $s3->getBucket($bucket);
-    foreach ($objects as $key => $object):
-       $s3->deleteObject($bucket,$key);
-    endforeach;
+
+    make_empty_s3_bucket($s3, $bucket);
+
     return $s3->deleteBucket($bucket);
+}
+
+/**
+ * @param S3 $s3
+ * @param string $bucket
+ * @return bool
+ */
+function make_empty_s3_bucket(S3 $s3, string $bucket){
+
+    try {
+        $objects = $s3->getBucket($bucket);
+
+        foreach ($objects as $key => $object):
+
+            $s3->deleteObject($bucket, $key);
+
+        endforeach;
+
+        // Bucket exists
+        return is_array($objects);
+
+    }catch (Exception $exception){
+        // keep silent if no bucket
+    }
+
+    return false;
+
 }
 
 /**
  * @return array
  * @throws dml_exception
  */
-function get_s3_instance(){
-    $access_key = get_config('webgl','access_key');
-    $secret_key = get_config('webgl','secret_key');
-    $endpoint = get_config('webgl','endpoint');
-    $s3 = new S3($access_key,$secret_key,false,$endpoint);
+function get_s3_instance()
+{
+    $access_key = get_config('webgl', 'access_key');
+    $secret_key = get_config('webgl', 'secret_key');
+    $endpoint = get_config('webgl', 'endpoint');
+    $s3 = new S3($access_key, $secret_key, false, $endpoint);
     $s3->setExceptions(true);
 
     // Port of curl::__construct().
@@ -201,13 +279,19 @@ function get_s3_instance(){
 }
 
 
+/**
+ * @throws dml_exception
+ */
 function upload_zip_file($webgl, $mform, $elname, $res)
 {
     if ($webgl->store_zip_file) {
 
-        if ($webgl->storage_engine == 1) {
+        if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_AZURE) {
+
             $zipcontent = $mform->get_file_content($elname);
+
             import_zip_contents($webgl, $zipcontent);
+
         } else {
             list($s3, $endpoint) = get_s3_instance();
 
@@ -226,14 +310,16 @@ function upload_zip_file($webgl, $mform, $elname, $res)
  * @param $blobdatadetails
  * @return mixed
  */
-function index_file_url($webgl, $blobdatadetails) {
-    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3){
+function index_file_url($webgl, $blobdatadetails)
+{
+    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
         $webgl->index_file_url = $blobdatadetails['index'];
-    }else{
+    } else {
         $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
     }
     return $webgl;
 }
+
 /**
  * @param $haystack
  * @param $needle
@@ -244,7 +330,7 @@ function str_replace_first($haystack, $needle, $replace)
 {
     $pos = strpos($haystack, $needle);
     if ($pos !== false) {
-        return substr_replace($haystack, $replace, 0, $pos );
+        return substr_replace($haystack, $replace, 0, $pos);
     }
 }
 
@@ -254,7 +340,8 @@ function str_replace_first($haystack, $needle, $replace)
  * @throws coding_exception
  * @throws moodle_exception
  */
-function  activity_navigation($PAGE) {
+function activity_navigation($PAGE)
+{
     global $CFG;
     // First we should check if we want to add navigation.
     $context = $PAGE->context;
@@ -306,7 +393,7 @@ function  activity_navigation($PAGE) {
 
     // Get the position in the array of the course module we are viewing.
     $position = array_search($PAGE->cm->id, $modids);
-    $sectionurl = new moodle_url('/course/view.php',['id'=>$course->id,'section'=>$section->section]);
+    $sectionurl = new moodle_url('/course/view.php', ['id' => $course->id, 'section' => $section->section]);
 
     $prevmod = null;
     $nextmod = null;
@@ -321,7 +408,7 @@ function  activity_navigation($PAGE) {
         if (!$prevmod->visible) {
             $linknameprev .= ' ' . get_string('hiddenwithbrackets');
         }
-        $prevtotalurl = '<a href="'.$linkurlprev.'" id="prev-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknameprev.'">'.$linknameprev.'</a>';
+        $prevtotalurl = '<a href="' . $linkurlprev . '" id="prev-activity-link" class="btn btn-link btn-action text-truncate" title="' . $linknameprev . '">' . $linknameprev . '</a>';
     }
 
 
@@ -333,22 +420,22 @@ function  activity_navigation($PAGE) {
         if (!$nextmod->visible) {
             $linknamenext .= ' ' . get_string('hiddenwithbrackets');
         }
-        $nexttotalurl = '<a href="'.$linkurlnext.'" id="next-activity-link" class="btn btn-link btn-action text-truncate" title="'.$linknamenext.'"> '.$linknamenext.'</a>';
+        $nexttotalurl = '<a href="' . $linkurlnext . '" id="next-activity-link" class="btn btn-link btn-action text-truncate" title="' . $linknamenext . '"> ' . $linknamenext . '</a>';
     }
-    $sectioname = $section->name ?? get_string('sectionname','format_'.$course->format).' '.$section->section;
-    $sectioninfourl = $section->section > 0 ? '<a href="'.$sectionurl.'"   id="activity-link" class="btn btn-link btn-action text-truncate" title="'.$sectioname.'">' .$sectioname.'</a>':'';
+    $sectioname = $section->name ?? get_string('sectionname', 'format_' . $course->format) . ' ' . $section->section;
+    $sectioninfourl = $section->section > 0 ? '<a href="' . $sectionurl . '"   id="activity-link" class="btn btn-link btn-action text-truncate" title="' . $sectioname . '">' . $sectioname . '</a>' : '';
 
     return '<div class="course-footer-nav">
         <hr class="hr">
         <div class="row">
             <div class="col-sm-12 col-md">
-                <div class="pull-left">'.$prevtotalurl.'</div>
+                <div class="pull-left">' . $prevtotalurl . '</div>
             </div>
             <div class="col-sm-12 col-md-2">
-                <div class="mdl-align" >'.$sectioninfourl.'</div>
+                <div class="mdl-align" >' . $sectioninfourl . '</div>
             </div>
             <div class="col-sm-12 col-md">
-                <div class="pull-right">'.$nexttotalurl.'</div>
+                <div class="pull-right">' . $nexttotalurl . '</div>
             </div>
         </div>
     </div>';
