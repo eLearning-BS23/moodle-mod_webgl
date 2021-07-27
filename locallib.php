@@ -4,39 +4,6 @@
 require_once 'classes/BlobStorage.php';
 
 
-/**
- * Make prefix webgl blob file name.
- * @param stdClass $webgl
- * @return string
- */
-function cloudstoragewebglcontentprefix(stdClass $webgl)
-{
-    $hostname = gethostname();
-
-    $bucket = "$hostname-course-$webgl->course" . "-module-id-$webgl->id";
-
-    $bucket = strtolower($bucket);
-
-    $bucket = str_replace('_', '-', $bucket);
-
-    $bucket = str_replace('.', '-', $bucket);
-
-    $bucket_length = strlen($bucket);
-
-    if ($bucket_length < 3) {
-
-        $bucket .= random_string(10);
-
-    } elseif ($bucket_length > 63) {
-
-        $excited_length = $bucket_length - 63;
-
-        $bucket = substr_replace($bucket, "", rand(15, 20), $excited_length);
-
-    }
-
-    return $bucket;
-}
 
 /**
  * Extracts the imported zip contents.
@@ -154,48 +121,125 @@ function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtemp
 
 
 /**
- * Extracts the imported zip contents.
- * Push to Azure BLOB storage.
- * @param stdClass $webgl
- * @param string $content
- * @return void
+ * @throws dml_exception
  */
-function import_zip_contents(stdClass $webgl, string $content): void
+function upload_zip_file($webgl, $mform, $elname, $res)
 {
-    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+    if ($webgl->store_zip_file) {
 
-    $prefix = cloudstoragewebglcontentprefix($webgl);
+        if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_AZURE) {
 
-    $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
+            $zipcontent = $mform->get_file_content($elname);
 
-    $contetnttype = "application/octet-stream";
+            import_zip_contents($webgl, $zipcontent);
 
-    uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
+        } else {
+            list($s3, $endpoint) = get_s3_instance($webgl);
+
+            $prefix = cloudstoragewebglcontentprefix($webgl);
+
+            $bucket = $prefix;
+
+            $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
+
+            $s3->putObject($s3->inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
+                'Content-Type' => "application/octet-stream"
+            ]);
+
+        }
+    }
+}
+
+/**
+ * @return array
+ * @throws dml_exception
+ */
+function get_s3_instance(stdClass $webgl)
+{
+    $access_key = empty($webgl->access_key) ? $webgl->access_key :  get_config('webgl', 'access_key');
+
+    $secret_key = empty($webgl->secret_key) ? $webgl->secret_key : get_config('webgl', 'secret_key');
+
+    $endpoint = empty($webgl->endpoint) ? $webgl->endpoint : get_config('webgl', 'endpoint');
+
+    $s3 = new S3($access_key, $secret_key, false, $endpoint);
+
+    $s3->setExceptions(true);
+
+    // Port of curl::__construct().
+    if (!empty($CFG->proxyhost)) {
+
+        if (empty($CFG->proxyport)) {
+
+            $proxyhost = $CFG->proxyhost;
+
+        } else {
+
+            $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
+        }
+
+        $proxytype = CURLPROXY_HTTP;
+
+        $proxyuser = null;
+
+        $proxypass = null;
+
+        if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
+
+            $proxyuser = $CFG->proxyuser;
+
+            $proxypass = $CFG->proxypassword;
+
+        }
+
+        if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
+
+            $proxytype = CURLPROXY_SOCKS5;
+
+        }
+
+        $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
+    }
+    return [$s3, $endpoint];
+}
+
+
+/**
+ * Make prefix webgl blob file name.
+ * @param stdClass $webgl
+ * @return string
+ */
+function cloudstoragewebglcontentprefix(stdClass $webgl)
+{
+    $hostname = gethostname();
+
+    $bucket = "$hostname-course-$webgl->course" . "-module-id-$webgl->id";
+
+    $bucket = strtolower($bucket);
+
+    $bucket = str_replace('_', '-', $bucket);
+
+    $bucket = str_replace('.', '-', $bucket);
+
+    $bucket_length = strlen($bucket);
+
+    if ($bucket_length < 3) {
+
+        $bucket .= random_string(10);
+
+    } elseif ($bucket_length > 63) {
+
+        $excited_length = $bucket_length - 63;
+
+        $bucket = substr_replace($bucket, "", 20, $excited_length);
+
+    }
+
+    return $bucket;
 }
 
 /**
  * @param stdClass $webgl
- * @return void
- * @throws coding_exception
- * @throws moodle_exception
- */
-function download_container_blobs(stdClass $webgl): void
-{
-    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
-    downloadBlobs($blobClient, $webgl);
-}
-
-/**
- * Delete azure blob container content.
- * @param stdClass $webgl
- */
-function delete_container_blobs(stdClass $webgl)
-{
-    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
-    deleteBlobs($blobClient, $webgl);
-}
-
-/**
  * @param string $bucket
  * @param string $visibility
  * @param string $location
@@ -259,88 +303,47 @@ function make_empty_s3_bucket(S3 $s3, string $bucket){
 
 }
 
+
 /**
- * @return array
- * @throws dml_exception
+ * Extracts the imported zip contents.
+ * Push to Azure BLOB storage.
+ * @param stdClass $webgl
+ * @param string $content
+ * @return void
  */
-function get_s3_instance(stdClass $webgl)
+function import_zip_contents(stdClass $webgl, string $content): void
 {
-    $access_key = empty($webgl->access_key) ? $webgl->access_key :  get_config('webgl', 'access_key');
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
 
-    $secret_key = empty($webgl->secret_key) ? $webgl->secret_key : get_config('webgl', 'secret_key');
+    $prefix = cloudstoragewebglcontentprefix($webgl);
 
-    $endpoint = empty($webgl->endpoint) ? $webgl->endpoint : get_config('webgl', 'endpoint');
+    $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
 
-    $s3 = new S3($access_key, $secret_key, false, $endpoint);
+    $contetnttype = "application/octet-stream";
 
-    $s3->setExceptions(true);
-
-    // Port of curl::__construct().
-    if (!empty($CFG->proxyhost)) {
-
-        if (empty($CFG->proxyport)) {
-
-            $proxyhost = $CFG->proxyhost;
-
-        } else {
-
-            $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
-        }
-
-        $proxytype = CURLPROXY_HTTP;
-
-        $proxyuser = null;
-
-        $proxypass = null;
-
-        if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
-
-            $proxyuser = $CFG->proxyuser;
-
-            $proxypass = $CFG->proxypassword;
-
-        }
-
-        if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
-
-            $proxytype = CURLPROXY_SOCKS5;
-
-        }
-
-        $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
-    }
-    return [$s3, $endpoint];
+    uploadBlob($blobClient, $filename, $content, $contetnttype, $webgl->container_name);
 }
 
+/**
+ * @param stdClass $webgl
+ * @return void
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function download_container_blobs(stdClass $webgl): void
+{
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+    downloadBlobs($blobClient, $webgl);
+}
 
 /**
- * @throws dml_exception
+ * Delete azure blob container content.
+ * @param stdClass $webgl
  */
-function upload_zip_file($webgl, $mform, $elname, $res)
+function delete_container_blobs(stdClass $webgl)
 {
-    if ($webgl->store_zip_file) {
-
-        if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_AZURE) {
-
-            $zipcontent = $mform->get_file_content($elname);
-
-            import_zip_contents($webgl, $zipcontent);
-
-        } else {
-            list($s3, $endpoint) = get_s3_instance($webgl);
-
-            $prefix = cloudstoragewebglcontentprefix($webgl);
-
-            $bucket = $prefix;
-
-            $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
-
-            $s3->putObject($s3->inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
-                'Content-Type' => "application/octet-stream"
-            ]);
-
-        }
-    }
+    $blobClient = getConnection($webgl->account_name, $webgl->account_key);
+    deleteBlobs($blobClient, $webgl);
 }
 
 /**
@@ -478,6 +481,3 @@ function activity_navigation($PAGE)
         </div>
     </div>';
 }
-
-
-
