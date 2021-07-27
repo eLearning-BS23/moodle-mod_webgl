@@ -84,7 +84,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
         $bucket = $replacewith;
 
-        list($s3, $endpoint) = s3_create_bucket($bucket);
+        list($s3, $endpoint) = s3_create_bucket($webgl, $bucket);
 
         foreach ($filelist as $filename => $value):
 
@@ -187,9 +187,9 @@ function delete_container_blobs(stdClass $webgl)
  * @return array
  * @throws dml_exception
  */
-function s3_create_bucket(string $bucket, string $visibility = S3::ACL_PRIVATE, string $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
+function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = S3::ACL_PRIVATE, string $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION)
 {
-    list($s3, $endpoint) = get_s3_instance();
+    list($s3, $endpoint) = get_s3_instance($webgl);
 
     $bucket_object_removed = make_empty_s3_bucket($s3, $bucket);
 
@@ -208,7 +208,7 @@ function s3_create_bucket(string $bucket, string $visibility = S3::ACL_PRIVATE, 
  */
 function delete_s3_bucket(stdClass $webgl)
 {
-    list($s3, $endpoint) = get_s3_instance();
+    list($s3, $endpoint) = get_s3_instance($webgl);
 
     $bucket = cloudstoragewebglcontentprefix($webgl);
 
@@ -248,31 +248,50 @@ function make_empty_s3_bucket(S3 $s3, string $bucket){
  * @return array
  * @throws dml_exception
  */
-function get_s3_instance()
+function get_s3_instance(stdClass $webgl)
 {
-    $access_key = get_config('webgl', 'access_key');
-    $secret_key = get_config('webgl', 'secret_key');
-    $endpoint = get_config('webgl', 'endpoint');
+    $access_key = empty($webgl->access_key) ? $webgl->access_key :  get_config('webgl', 'access_key');
+
+    $secret_key = empty($webgl->secret_key) ? $webgl->secret_key : get_config('webgl', 'secret_key');
+
+    $endpoint = empty($webgl->endpoint) ? $webgl->endpoint : get_config('webgl', 'endpoint');
+
     $s3 = new S3($access_key, $secret_key, false, $endpoint);
+
     $s3->setExceptions(true);
 
     // Port of curl::__construct().
     if (!empty($CFG->proxyhost)) {
+
         if (empty($CFG->proxyport)) {
+
             $proxyhost = $CFG->proxyhost;
+
         } else {
+
             $proxyhost = $CFG->proxyhost . ':' . $CFG->proxyport;
         }
+
         $proxytype = CURLPROXY_HTTP;
+
         $proxyuser = null;
+
         $proxypass = null;
+
         if (!empty($CFG->proxyuser) and !empty($CFG->proxypassword)) {
+
             $proxyuser = $CFG->proxyuser;
+
             $proxypass = $CFG->proxypassword;
+
         }
+
         if (!empty($CFG->proxytype) && $CFG->proxytype == 'SOCKS5') {
+
             $proxytype = CURLPROXY_SOCKS5;
+
         }
+
         $s3->setProxy($proxyhost, $proxyuser, $proxypass, $proxytype);
     }
     return [$s3, $endpoint];
@@ -293,14 +312,18 @@ function upload_zip_file($webgl, $mform, $elname, $res)
             import_zip_contents($webgl, $zipcontent);
 
         } else {
-            list($s3, $endpoint) = get_s3_instance();
+            list($s3, $endpoint) = get_s3_instance($webgl);
 
             $prefix = cloudstoragewebglcontentprefix($webgl);
+
             $bucket = $prefix;
+
             $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
+
             $s3->putObject(S3::inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
                 'Content-Type' => "application/octet-stream"
             ]);
+
         }
     }
 }
