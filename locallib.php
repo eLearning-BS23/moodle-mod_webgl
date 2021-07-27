@@ -70,7 +70,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath) : 
                 $s3->putObject(S3::inputFile($cfile),$bucket,$endpoint.'/'.$filename,S3::ACL_PUBLIC_READ);
             }
         endforeach;
-        return ['index' => "https://$bucket.$endpoint/".$endpoint.'/'. cloudstoragewebglcontentprefix($webgl).'/index.html'];
+        return ['index' => "https://$endpoint/"."$bucket/".$endpoint.'/'. cloudstoragewebglcontentprefix($webgl).'/index.html'];
     }else{
 
     $blobClient = getConnection($webgl->account_name, $webgl->account_key);
