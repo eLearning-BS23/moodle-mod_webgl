@@ -1,5 +1,4 @@
 <?php
-
 /**
  * webgl module language file
  *
@@ -14,7 +13,7 @@ $string['modulename_help'] = 'WebGL is a JavaScript API for rendering interactiv
 $string['contentheader'] = 'Content';
 $string['input:file'] = 'WebGL file';
 $string['header:content'] = 'WebGL content';
-//TODO: Find these strings in the UI and make sure they are logical
+// TODO: Find these strings in the UI and make sure they are logical.
 $string['webgl:addinstance'] = 'Add a new WebGL Application.';
 $string['webgl:submit'] = 'Submit WebGL Application';
 $string['webgl:view'] = 'View webGL';
@@ -33,10 +32,7 @@ $string['content_advcheckbox_help'] = 'If enabled,you can also update the WebGL 
 
 $string['download_exception'] = 'You must specify a course_module ID or an instance ID';
 
-
-///////////////////////////////////
-//BEGIN: Fields in the admin form//
-///////////////////////////////////
+// BEGIN: Fields in the admin form.
 
 $string['account_name'] = 'Azure Storage Account Name';
 $string['account_name_help'] = 'An Azure storage account contains all of your Azure Storage data objects: blobs, files, queues, tables, and disks. The storage account provides a unique namespace for your Azure Storage data that is accessible from anywhere in the world over HTTP or HTTPS. Data in your Azure storage account is durable and highly available, secure, and massively scalable.';
@@ -46,7 +42,6 @@ $string['account_key_help'] = 'When you create a storage account, Azure generate
 
 $string['container_name'] = 'Blob storage container';
 $string['container_name_help'] = 'Azure Blob Storage helps you create data lakes for your analytics needs, and provides storage to build powerful cloud-native and mobile apps. Optimize costs with tiered storage for your long-term data, and flexibly scale up for high-performance computing and machine learning workloads.';
-
 
 $string['access_key'] = 'AWS access key';
 $string['access_key_help'] = 'AWS access key';
@@ -78,11 +73,10 @@ $string['iframe_width'] = 'Content Width';
 $string['iframe_width_help'] = 'Width of the Iframe that load WebGL content in (pixels, (r)em, percentages). Default Value is 100%.';
 $moduleintro = get_string('moduleintro');
 
-$string['before_description'] = 'Show WebGL content before '.$moduleintro.' section.';
-$string['before_description_help'] = 'By default WebGL content will show after '.$moduleintro.' section. Check the checkbox If you want to show content before '.$moduleintro.' section ';
+$string['before_description'] = 'Show WebGL content before ' . $moduleintro . ' section.';
+$string['before_description_help'] = 'By default WebGL content will show after ' . $moduleintro . ' section. Check the checkbox If you want to show content before ' . $moduleintro . ' section ';
 
 $string['storage'] = 'Storage details';
 $string['storage'] = 'Storage details';
-/////////////////////////////////
-//END: Fields in the admin form//
-/////////////////////////////////
+
+// END: Fields in the admin form.

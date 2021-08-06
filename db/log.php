@@ -1,5 +1,4 @@
 <?php
-
 /**
  * webgl activity logs
  *
@@ -11,6 +10,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $logs = array(
-    array('module'=>'webgl', 'action'=>'add', 'mtable'=>'webgl', 'field'=>'name'),
-    array('module'=>'webgl', 'action'=>'update', 'mtable'=>'webgl', 'field'=>'name'),
+    array('module' => 'webgl', 'action' => 'add', 'mtable' => 'webgl', 'field' => 'name'),
+    array('module' => 'webgl', 'action' => 'update', 'mtable' => 'webgl', 'field' => 'name'),
 );

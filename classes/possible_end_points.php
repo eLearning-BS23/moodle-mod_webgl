@@ -1,5 +1,4 @@
 <?php
-
 defined('MOODLE_INTERNAL') || die();
 
 return [
@@ -14,5 +13,5 @@ return [
     "s3-ap-southeast-1.amazonaws.com" => "s3-ap-southeast-1.amazonaws.com",
     "s3-ap-southeast-2.amazonaws.com" => "s3-ap-southeast-2.amazonaws.com",
     "s3-ap-northeast-1.amazonaws.com" => "s3-ap-northeast-1.amazonaws.com",
-    "s3-sa-east-1.amazonaws.com" => "s3-sa-east-1.amazonaws.com"
+    "s3-sa-east-1.amazonaws.com" => "s3-sa-east-1.amazonaws.com",
 ];
