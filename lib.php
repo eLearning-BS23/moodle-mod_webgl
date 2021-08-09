@@ -1,18 +1,18 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of the Zoom plugin for Moodle - http://moodle.org/
 //
-// Moodle is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; version 3
-// of the License.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// This program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Library of interface functions and constants for module webgl
@@ -28,9 +28,9 @@ const BS_WEBGL_INDEX = 'bs_webgl_index';
 
 const AZURE_BLOB_DEFAULT_CONTENT_TYPE = 'text/plain';
 
-require_once 'locallib.php';
+require_once ('locallib.php');
 
-require_once $CFG->dirroot.'/repository/s3/S3.php';
+require_once ($CFG->dirroot . '/repository/s3/S3.php');
 
 /**
  * Returns the information on whether the module supports a feature
@@ -40,10 +40,9 @@ require_once $CFG->dirroot.'/repository/s3/S3.php';
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
  */
-function webgl_supports(string $feature): ?bool
-{
+function webgl_supports(string $feature): ?bool {
 
-    switch($feature) {
+    switch ($feature) {
         case FEATURE_SHOW_DESCRIPTION:
         case FEATURE_MOD_INTRO:
         case FEATURE_COMPLETION_TRACKS_VIEWS:
@@ -69,8 +68,7 @@ function webgl_supports(string $feature): ?bool
  * @return int The id of the newly inserted webgl record
  * @throws dml_exception|moodle_exception
  */
-function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): int
-{
+function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): int {
     global $DB;
     $elname = 'importfile';
     $webgl->webgl_file = $mform->get_new_filename('importfile');
@@ -83,13 +81,11 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): 
 
     upload_zip_file($webgl, $mform, $elname, $res);
 
-
-    if ($res){
+    if ($res) {
         @unlink($res);
     }
     return $webgl->id;
 }
-
 
 /**
  * Updates an instance of the webgl in the database
@@ -104,16 +100,15 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): 
  * @throws dml_exception
  * @throws moodle_exception
  */
-function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): bool
-{
-    global $DB,$USER;
+function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): bool {
+    global $DB, $USER;
     $elname = 'importfile';
 
     // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;
     $basefilename = $mform->get_new_filename($elname);
-    if ($basefilename){
+    if ($basefilename) {
         $res = $mform->save_temp_file('importfile');
         $blobdatadetails = import_extract_upload_contents($webgl, $res);
         $webgl = index_file_url($webgl, $blobdatadetails);
@@ -122,8 +117,7 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
 
         upload_zip_file($webgl, $mform, $elname, $res);
 
-
-        if ($res){
+        if ($res) {
             @unlink($res);
         }
 
@@ -131,7 +125,6 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
 
     return $DB->update_record('webgl', $webgl);
 }
-
 
 /**
  * This standard function will check all instances of this module
@@ -144,8 +137,7 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
  * @return bool
  * @throws dml_exception
  */
-function webgl_refresh_events($courseid = 0): bool
-{
+function webgl_refresh_events($courseid = 0): bool {
     global $DB;
 
     if ($courseid == 0) {
@@ -177,23 +169,22 @@ function webgl_refresh_events($courseid = 0): bool
  * @return boolean Success/Failure
  * @throws dml_exception
  */
-function webgl_delete_instance($id): bool
-{
+function webgl_delete_instance($id): bool {
     global $DB;
 
-    if (! $webgl = $DB->get_record('webgl', array('id' => $id))) {
+    if (!$webgl = $DB->get_record('webgl', array('id' => $id))) {
         return false;
     }
 
     // Delete any dependent records here.
 
     $DB->delete_records('webgl', array('id' => $webgl->id));
-    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3){
+    if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
         delete_s3_bucket($webgl);
-    }else{
+    } else {
         delete_container_blobs($webgl);
     }
-//    webgl_grade_item_delete($webgl);
+    // webgl_grade_item_delete($webgl).
 
     return true;
 }
@@ -212,8 +203,7 @@ function webgl_delete_instance($id): bool
  * @param stdClass $webgl The webgl instance record
  * @return stdClass|null
  */
-function webgl_user_outline($course, $user, $mod, $webgl): ?stdClass
-{
+function webgl_user_outline($course, $user, $mod, $webgl): ?stdClass{
 
     $return = new stdClass();
     $return->time = 0;
@@ -265,7 +255,7 @@ function webgl_print_recent_activity($course, $viewfullnames, $timestart) {
  * @param int $userid check for a particular user's activity only, defaults to 0 (all users)
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  */
-function webgl_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+function webgl_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid = 0, $groupid = 0) {
 }
 
 /**
@@ -290,7 +280,7 @@ function webgl_print_recent_mod_activity($activity, $courseid, $detail, $modname
  *
  * @return boolean
  */
-function webgl_cron () {
+function webgl_cron() {
     return true;
 }
 
@@ -355,9 +345,9 @@ function webgl_scale_used_anywhere($scaleid) {
  * @param bool $reset reset grades in the gradebook
  * @return void
  */
-function webgl_grade_item_update(stdClass $webgl, $reset=false) {
+function webgl_grade_item_update(stdClass $webgl, $reset = false) {
     global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
+    require_once ($CFG->libdir . '/gradelib.php');
 
     $item = array();
     $item['itemname'] = clean_param($webgl->name, PARAM_NOTAGS);
@@ -365,11 +355,11 @@ function webgl_grade_item_update(stdClass $webgl, $reset=false) {
 
     if ($webgl->grade > 0) {
         $item['gradetype'] = GRADE_TYPE_VALUE;
-        $item['grademax']  = $webgl->grade;
-        $item['grademin']  = 0;
+        $item['grademax'] = $webgl->grade;
+        $item['grademin'] = 0;
     } else if ($webgl->grade < 0) {
         $item['gradetype'] = GRADE_TYPE_SCALE;
-        $item['scaleid']   = -$webgl->grade;
+        $item['scaleid'] = -$webgl->grade;
     } else {
         $item['gradetype'] = GRADE_TYPE_NONE;
     }
@@ -390,7 +380,7 @@ function webgl_grade_item_update(stdClass $webgl, $reset=false) {
  */
 function webgl_grade_item_delete($webgl) {
     global $CFG;
-    require_once($CFG->libdir.'/gradelib.php');
+    require_once ($CFG->libdir . '/gradelib.php');
 
     return grade_update('mod/webgl', $webgl->course, 'mod', 'webgl',
         $webgl->id, 0, null, array('deleted' => 1));
@@ -406,7 +396,7 @@ function webgl_grade_item_delete($webgl) {
  */
 function webgl_update_grades(stdClass $webgl, $userid = 0) {
     global $CFG, $DB;
-    require_once($CFG->libdir.'/gradelib.php');
+    require_once ($CFG->libdir . '/gradelib.php');
 
     // Populate array of grade objects indexed by userid.
     $grades = array();
@@ -449,8 +439,7 @@ function webgl_get_file_areas($course, $cm, $context): array
  * @param string $filename
  * @return file_info instance or null if not found
  */
-function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename): ?file_info
-{
+function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename): ?file_info {
     return null;
 }
 
@@ -468,7 +457,7 @@ function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  */
-function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
+function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = array()) {
     global $DB, $CFG;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -505,6 +494,6 @@ function webgl_extend_navigation(navigation_node $navref, stdClass $course, stdC
  * @param settings_navigation $settingsnav complete settings navigation tree
  * @param navigation_node $webglnode webgl administration node
  */
-function webgl_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $webglnode=null) {
+function webgl_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $webglnode = null) {
     // TODO Delete this function and its docblock, or implement it.
 }

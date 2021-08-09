@@ -1,5 +1,4 @@
 <?php
-
 /**
  * WebGL plugin version info
  *
@@ -10,14 +9,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2020112501;       // The current version (Date: YYYYMMDDXX)
+$plugin->version = 2021080902; // The current version (Date: YYYYMMDDXX).
 
-$plugin->requires  = 2019111806;    // Requires this Moodle version
+$plugin->requires = 2019111806; // Requires this Moodle version.
 
-$plugin->component = 'mod_webgl'; // Full name of the plugin (used for diagnostics)
+$plugin->component = 'mod_webgl'; // Full name of the plugin (used for diagnostics).
 
 $plugin->dependencies = [
-    'repository_s3' => 2019111800
+    'repository_s3' => 2019111800,
 ];
 
 $plugin->release = 'v-1.0.0';
