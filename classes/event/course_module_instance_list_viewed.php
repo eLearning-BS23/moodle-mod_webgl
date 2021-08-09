@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>
 
 // Copyright 2018 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+
 /**
  * The mod_webgl instance list viewed event.
  *

@@ -1,22 +1,10 @@
 <?php
 /**
- * LICENSE: The MIT License (the "License")
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * https://github.com/azure/azure-storage-php/LICENSE
+ * Defines Blob Storage.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @category  Microsoft
- * @package   MicrosoftAzure\Storage\Samples
- * @author    Azure Storage PHP SDK <dmsh@microsoft.com>
- * @copyright 2016 Microsoft Corporation
- * @license   https://github.com/azure/azure-storage-php/LICENSE
- * @link      https://github.com/azure/azure-storage-php
+ * @package mod_webgl
+ * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die;
 
@@ -29,6 +17,8 @@ use MicrosoftAzure\Storage\Blob\Models\SetBlobPropertiesOptions;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 
 /**
+ * Establish connection
+ *
  * @param string $accountname
  * @param string $accountkey
  * @return BlobRestProxy
@@ -41,6 +31,7 @@ function get_connection(string $accountname, string $accountkey) {
 
 /**
  * Create a new Blob
+ *
  * @param BlobRestProxy $blobclient
  * @param $blobname
  * @param $content
@@ -191,6 +182,7 @@ function delete_blob(BlobRestProxy $blobclient, string $container, string $blobn
 }
 
 /**
+ * Download blob stream content.
  * @param BlobRestProxy $blobclient
  * @param string $container
  * @param string $blob
