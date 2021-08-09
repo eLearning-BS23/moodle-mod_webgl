@@ -18,6 +18,7 @@
  * @license   https://github.com/azure/azure-storage-php/LICENSE
  * @link      https://github.com/azure/azure-storage-php
  */
+defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
 require_once ($CFG->dirroot . '/mod/webgl/vendor/autoload.php');
@@ -28,8 +29,8 @@ use MicrosoftAzure\Storage\Blob\Models\SetBlobPropertiesOptions;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 
 /**
- * @param string $AccountName
- * @param string $AccountKey
+ * @param string $accountname
+ * @param string $accountkey
  * @return BlobRestProxy
  */
 function get_connection(string $accountname, string $accountkey) {
