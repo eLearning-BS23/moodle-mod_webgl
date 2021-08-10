@@ -28,9 +28,9 @@ const BS_WEBGL_INDEX = 'bs_webgl_index';
 
 const AZURE_BLOB_DEFAULT_CONTENT_TYPE = 'text/plain';
 
-require_once ('locallib.php');
+require_once('locallib.php');
 
-require_once ($CFG->dirroot . '/repository/s3/S3.php');
+require_once($CFG->dirroot . '/repository/s3/S3.php');
 
 /**
  * Returns the information on whether the module supports a feature
@@ -150,10 +150,10 @@ function webgl_refresh_events($courseid = 0): bool {
         }
     }
 
-    foreach ($webgls as $webgl) {
-        // Create a function such as the one below to deal with updating calendar events.
-        // webgl_update_events($webgl);
-    }
+    // foreach ($webgls as $webgl) {
+    //     Create a function such as the one below to deal with updating calendar events.
+    //     webgl_update_events($webgl);
+    // }
 
     return true;
 }
@@ -184,7 +184,7 @@ function webgl_delete_instance($id): bool {
     } else {
         delete_container_blobs($webgl);
     }
-    // webgl_grade_item_delete($webgl).
+    // ... webgl_grade_item_delete($webgl).
 
     return true;
 }
@@ -203,7 +203,7 @@ function webgl_delete_instance($id): bool {
  * @param stdClass $webgl The webgl instance record
  * @return stdClass|null
  */
-function webgl_user_outline($course, $user, $mod, $webgl): ?stdClass{
+function webgl_user_outline($course, $user, $mod, $webgl): ?stdClass {
 
     $return = new stdClass();
     $return->time = 0;
@@ -347,7 +347,7 @@ function webgl_scale_used_anywhere($scaleid) {
  */
 function webgl_grade_item_update(stdClass $webgl, $reset = false) {
     global $CFG;
-    require_once ($CFG->libdir . '/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     $item = array();
     $item['itemname'] = clean_param($webgl->name, PARAM_NOTAGS);
@@ -380,7 +380,7 @@ function webgl_grade_item_update(stdClass $webgl, $reset = false) {
  */
 function webgl_grade_item_delete($webgl) {
     global $CFG;
-    require_once ($CFG->libdir . '/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     return grade_update('mod/webgl', $webgl->course, 'mod', 'webgl',
         $webgl->id, 0, null, array('deleted' => 1));
@@ -396,7 +396,7 @@ function webgl_grade_item_delete($webgl) {
  */
 function webgl_update_grades(stdClass $webgl, $userid = 0) {
     global $CFG, $DB;
-    require_once ($CFG->libdir . '/gradelib.php');
+    require_once($CFG->libdir . '/gradelib.php');
 
     // Populate array of grade objects indexed by userid.
     $grades = array();
@@ -417,16 +417,12 @@ function webgl_update_grades(stdClass $webgl, $userid = 0) {
  * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
  */
-function webgl_get_file_areas($course, $cm, $context): array
-{
+function webgl_get_file_areas($course, $cm, $context): array {
     return array();
 }
 
 /**
  * File browsing support for webgl file areas
- *
- * @package mod_webgl
- * @category files
  *
  * @param file_browser $browser
  * @param array $areas
@@ -438,6 +434,9 @@ function webgl_get_file_areas($course, $cm, $context): array
  * @param string $filepath
  * @param string $filename
  * @return file_info instance or null if not found
+ * @package mod_webgl
+ * @category files
+ *
  */
 function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename): ?file_info {
     return null;
@@ -446,9 +445,6 @@ function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea
 /**
  * Serves the files from the webgl file areas
  *
- * @package mod_webgl
- * @category files
- *
  * @param stdClass $course the course object
  * @param stdClass $cm the course module object
  * @param stdClass $context the webgl's context
@@ -456,6 +452,9 @@ function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
+ * @category files
+ *
+ * @package mod_webgl
  */
 function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = array()) {
     global $DB, $CFG;
