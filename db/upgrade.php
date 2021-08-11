@@ -44,6 +44,12 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+/**
+ * Webgl Module Upgrade function
+ *
+ * @param $oldversion
+ * @return bool
+ */
 function xmldb_webgl_upgrade($oldversion) {
     global $CFG;
 

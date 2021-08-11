@@ -92,7 +92,7 @@ function download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
             $bloblist = $blobclient->listBlobs($webgl->container_name, $listblobsoptions);
             foreach ($bloblist->getBlobs() as $blob) {
                 $filename = str_replace_first($blob->getName(), '/', "");
-                $stream = downloadBlobStreamContent($blobclient, $webgl->container_name, $blob->getName());
+                $stream = download_blob_stream_content($blobclient, $webgl->container_name, $blob->getName());
                 $stringarchive[$filename] = [stream_get_contents($stream)];
                 if ($zipper->archive_to_pathname($stringarchive, $temppath)) {
                     echo 'OKay' . PHP_EOL;
@@ -171,7 +171,7 @@ function delete_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
             $bloblist = $blobclient->listBlobs($webgl->container_name,
                 $listblobsoptions);
             foreach ($bloblist->getBlobs() as $blob) {
-                deleteBlob($blobclient, $webgl->container_name, $blob->getName());
+                delete_blob($blobclient, $webgl->container_name, $blob->getName());
             }
 
             $listblobsoptions->setContinuationToken($bloblist

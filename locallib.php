@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Locallib.
+ *
+ * @package mod_webgl
+ * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once('classes/BlobStorage.php');
@@ -85,7 +93,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
                 $content = fopen($cfile, "r");
 
-                uploadBlob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
+                upload_blob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
 
                 if (is_resource($content)) {
 
@@ -96,12 +104,13 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
         endforeach;
 
-        return listBlobs($blobclient, $webgl);
+        return list_blobs($blobclient, $webgl);
     }
 
 }
 
 /**
+ * Upload to s3.
  * @param stdClass $webgl
  * @param string $bucket
  * @param $filelist
@@ -130,6 +139,12 @@ function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtemp
 }
 
 /**
+ * Upload zip file.
+ *
+ * @param $webgl
+ * @param $mform
+ * @param $elname
+ * @param $res
  * @throws dml_exception
  */
 function upload_zip_file($webgl, $mform, $elname, $res) {
@@ -159,6 +174,10 @@ function upload_zip_file($webgl, $mform, $elname, $res) {
 }
 
 /**
+ * Get s3 instance.
+ *
+ * @param stdClass $webgl
+ * @param bool $exceptionenabled
  * @return array
  * @throws dml_exception
  */
@@ -244,6 +263,8 @@ function cloudstoragewebglcontentprefix(stdClass $webgl) {
 }
 
 /**
+ * Create s3 bucket.
+ *
  * @param stdClass $webgl
  * @param string $bucket
  * @param string $visibility
@@ -266,6 +287,9 @@ function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = 
 }
 
 /**
+ * Delete s3 Bucket.
+ *
+ * @param stdClass $webgl
  * @throws dml_exception
  */
 function delete_s3_bucket(stdClass $webgl) {
@@ -279,6 +303,8 @@ function delete_s3_bucket(stdClass $webgl) {
 }
 
 /**
+ * Make empty s3 bucket.
+ *
  * @param S3 $s3
  * @param string $bucket
  * @return bool
@@ -318,10 +344,12 @@ function import_zip_contents(stdClass $webgl, string $content): void {
 
     $contetnttype = "application/octet-stream";
 
-    uploadBlob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
+    upload_blob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
 }
 
 /**
+ * Download container blobs.
+ *
  * @param stdClass $webgl
  * @return void
  * @throws coding_exception
@@ -329,7 +357,7 @@ function import_zip_contents(stdClass $webgl, string $content): void {
  */
 function download_container_blobs(stdClass $webgl): void {
     $blobclient = get_connection($webgl->account_name, $webgl->account_key);
-    downloadBlobs($blobclient, $webgl);
+    download_blobs($blobclient, $webgl);
 }
 
 /**
@@ -338,10 +366,12 @@ function download_container_blobs(stdClass $webgl): void {
  */
 function delete_container_blobs(stdClass $webgl) {
     $blobclient = get_connection($webgl->account_name, $webgl->account_key);
-    deleteBlobs($blobclient, $webgl);
+    delete_blobs($blobclient, $webgl);
 }
 
 /**
+ * Index file url.
+ *
  * @param $webgl
  * @param $blobdatadetails
  * @return mixed
@@ -356,6 +386,8 @@ function index_file_url($webgl, $blobdatadetails) {
 }
 
 /**
+ * String replace first.
+ *
  * @param $haystack
  * @param $needle
  * @param $replace
@@ -369,6 +401,8 @@ function str_replace_first($haystack, $needle, $replace) {
 }
 
 /**
+ * Activity navigation.
+ *
  * @param $PAGE
  * @return string
  * @throws coding_exception
@@ -464,17 +498,17 @@ function activity_navigation($PAGE) {
         . $sectioname . '">' . $sectioname . '</a>' : '';
 
     return '<div class="course-footer-nav">
-        <hr class="hr">
-        <div class="row">
-            <div class="col-sm-12 col-md">
-                <div class="pull-left">' . $prevtotalurl . '</div>
+            <hr class="hr">
+            <div class="row">
+                <div class="col-sm-12 col-md">
+                    <div class="pull-left">' . $prevtotalurl . '</div>
+                </div>
+                <div class="col-sm-12 col-md-2">
+                    <div class="mdl-align" >' . $sectioninfourl . '</div>
+                </div>
+                <div class="col-sm-12 col-md">
+                    <div class="pull-right">' . $nexttotalurl . '</div>
+                </div>
             </div>
-            <div class="col-sm-12 col-md-2">
-                <div class="mdl-align" >' . $sectioninfourl . '</div>
-            </div>
-            <div class="col-sm-12 col-md">
-                <div class="pull-right">' . $nexttotalurl . '</div>
-            </div>
-        </div>
-    </div>';
+        </div>';
 }

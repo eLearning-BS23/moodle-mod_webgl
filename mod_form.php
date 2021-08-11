@@ -14,6 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+
 /**
  * webgl activity form
  *
@@ -21,18 +27,27 @@
  * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot . '/course/moodleform_mod.php');
-
 class mod_webgl_mod_form extends moodleform_mod {
+    /**
+     * Storage engine azure.
+     */
     const STORAGE_ENGINE_AZURE = 1;
 
+    /**
+     * Storage engine s3.
+     */
     const STORAGE_ENGINE_S3 = 2;
 
+    /**
+     * Storage engine s3 default location.
+     */
     const STORAGE_ENGINE_S3_DEFAULT_LOCATION = 'ap-southeast-1';
 
+    /**
+     * Definition function of the class.
+     *
+     * return void
+     */
     public function definition() {
         global $CFG, $DB;
         $mform = $this->_form;
@@ -199,6 +214,8 @@ class mod_webgl_mod_form extends moodleform_mod {
     }
 
     /**
+     * Validation function.
+     *
      * @param array $data
      * @param array $files
      * @return array

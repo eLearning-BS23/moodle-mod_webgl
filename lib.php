@@ -24,8 +24,14 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * BS webgl index.
+ */
 const BS_WEBGL_INDEX = 'bs_webgl_index';
 
+/**
+ * Azure blob default content types.
+ */
 const AZURE_BLOB_DEFAULT_CONTENT_TYPE = 'text/plain';
 
 require_once('locallib.php');
@@ -35,7 +41,7 @@ require_once($CFG->dirroot . '/repository/s3/S3.php');
 /**
  * Returns the information on whether the module supports a feature
  *
- * See {@link plugin_supports()} for more info.
+ * See {@see plugin_supports()} for more info.
  *
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
@@ -243,7 +249,7 @@ function webgl_print_recent_activity($course, $viewfullnames, $timestart) {
  *
  * This callback function is supposed to populate the passed array with
  * custom activity records. These records are then rendered into HTML via
- * {@link webgl_print_recent_mod_activity()}.
+ * {@see webgl_print_recent_mod_activity()}.
  *
  * Returns void, it adds items into $activities and increases $index.
  *
@@ -259,12 +265,12 @@ function webgl_get_recent_mod_activity(&$activities, &$index, $timestart, $cours
 }
 
 /**
- * Prints single activity item prepared by {@link webgl_get_recent_mod_activity()}
+ * Prints single activity item prepared by {@see webgl_get_recent_mod_activity()}
  *
  * @param stdClass $activity activity record with added 'cmid' property
  * @param int $courseid the id of the course we produce the report for
  * @param bool $detail print detailed report
- * @param array $modnames as returned by {@link get_module_types_names()}
+ * @param array $modnames as returned by {@see get_module_types_names()}
  * @param bool $viewfullnames display users' full names
  */
 function webgl_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
@@ -339,7 +345,7 @@ function webgl_scale_used_anywhere($scaleid) {
 /**
  * Creates or updates grade item for the given webgl instance
  *
- * Needed by {@link grade_update_mod_grades()}.
+ * Needed by {@see grade_update_mod_grades()}.
  *
  * @param stdClass $webgl instance object with extra cmidnumber and modname property
  * @param bool $reset reset grades in the gradebook
@@ -389,7 +395,7 @@ function webgl_grade_item_delete($webgl) {
 /**
  * Update webgl grades in the gradebook
  *
- * Needed by {@link grade_update_mod_grades()}.
+ * Needed by {@see grade_update_mod_grades()}.
  *
  * @param stdClass $webgl instance object with extra cmidnumber and modname property
  * @param int $userid update grade of specific user only, 0 means all participants
@@ -410,7 +416,7 @@ function webgl_update_grades(stdClass $webgl, $userid = 0) {
  * Returns the lists of all browsable file areas within the given module context
  *
  * The file area 'intro' for the activity introduction field is added automatically
- * by {@link file_browser::get_file_info_context_module()}
+ * by {@see file_browser::get_file_info_context_module()}
  *
  * @param stdClass $course
  * @param stdClass $cm
