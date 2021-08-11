@@ -113,8 +113,8 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
  * Upload to s3.
  * @param stdClass $webgl
  * @param string $bucket
- * @param $filelist
- * @param $importtempdir
+ * @param array $filelist
+ * @param string $importtempdir
  * @param string $replacewith
  * @return mixed
  * @throws dml_exception
@@ -141,10 +141,10 @@ function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtemp
 /**
  * Upload zip file.
  *
- * @param $webgl
- * @param $mform
- * @param $elname
- * @param $res
+ * @param stdClass $webgl
+ * @param moodleform_mod $mform
+ * @param string $elname
+ * @param string $res
  * @throws dml_exception
  */
 function upload_zip_file($webgl, $mform, $elname, $res) {
@@ -231,6 +231,7 @@ function get_s3_instance(stdClass $webgl, $exceptionenabled = true) {
 
 /**
  * Make prefix webgl blob file name.
+ *
  * @param stdClass $webgl
  * @return string
  */
@@ -290,6 +291,7 @@ function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = 
  * Delete s3 Bucket.
  *
  * @param stdClass $webgl
+ * @return S3
  * @throws dml_exception
  */
 function delete_s3_bucket(stdClass $webgl) {
@@ -372,9 +374,9 @@ function delete_container_blobs(stdClass $webgl) {
 /**
  * Index file url.
  *
- * @param $webgl
- * @param $blobdatadetails
- * @return mixed
+ * @param stdClass $webgl
+ * @param array $blobdatadetails
+ * @return stdClass
  */
 function index_file_url($webgl, $blobdatadetails) {
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
@@ -388,9 +390,9 @@ function index_file_url($webgl, $blobdatadetails) {
 /**
  * String replace first.
  *
- * @param $haystack
- * @param $needle
- * @param $replace
+ * @param string $haystack
+ * @param string $needle
+ * @param string $replace
  * @return string|string[]
  */
 function str_replace_first($haystack, $needle, $replace) {
