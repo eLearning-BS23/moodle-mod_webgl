@@ -1,4 +1,19 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 /**
  * Defines Blob Storage.
  *
@@ -9,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
-require_once ($CFG->dirroot . '/mod/webgl/vendor/autoload.php');
+require_once($CFG->dirroot . '/mod/webgl/vendor/autoload.php');
 
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Blob\Models\ListBlobsOptions;
@@ -63,7 +78,7 @@ function upload_blob(BlobRestProxy $blobclient, $blobname, $content, string $con
 function download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
     $zipper = get_file_packer('application/zip');
     $temppath = make_request_directory() . DIRECTORY_SEPARATOR . $webgl
-        ->webgl_file;
+            ->webgl_file;
     try {
         // List blobs.
         $listblobsoptions = new ListBlobsOptions();
@@ -77,16 +92,16 @@ function download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
             $bloblist = $blobclient->listBlobs($webgl->container_name, $listblobsoptions);
             foreach ($bloblist->getBlobs() as $blob) {
                 $filename = str_replace_first($blob->getName(), '/', "");
-                $stream = downloadBlobStreamContent($blobclient, $webgl->container_name, $blob->getName());
+                $stream = download_blob_stream_content($blobclient, $webgl->container_name, $blob->getName());
                 $stringarchive[$filename] = [stream_get_contents($stream)];
                 if ($zipper->archive_to_pathname($stringarchive, $temppath)) {
                     echo 'OKay' . PHP_EOL;
                 } else {
-                    print_error('cannotdownloaddir', 'repository');
+                    throw new moodle_exception('cannotdownloaddir', 'repository');
                 }
             }
             $listblobsoptions->setContinuationToken($bloblist
-                    ->getContinuationToken());
+                ->getContinuationToken());
         } while ($bloblist->getContinuationToken());
         send_temp_file($temppath, $webgl->webgl_file);
     } catch (ServiceException $e) {
@@ -124,7 +139,7 @@ function list_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
             }
 
             $listblobsoptions->setContinuationToken($bloblist
-                    ->getContinuationToken());
+                ->getContinuationToken());
         } while ($bloblist->getContinuationToken());
 
     } catch (ServiceException $e) {
@@ -156,11 +171,11 @@ function delete_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
             $bloblist = $blobclient->listBlobs($webgl->container_name,
                 $listblobsoptions);
             foreach ($bloblist->getBlobs() as $blob) {
-                deleteBlob($blobclient, $webgl->container_name, $blob->getName());
+                delete_blob($blobclient, $webgl->container_name, $blob->getName());
             }
 
             $listblobsoptions->setContinuationToken($bloblist
-                    ->getContinuationToken());
+                ->getContinuationToken());
         } while ($bloblist->getContinuationToken());
 
     } catch (ServiceException $e) {

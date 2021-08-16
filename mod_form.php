@@ -1,4 +1,25 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/course/moodleform_mod.php');
+
 /**
  * webgl activity form
  *
@@ -6,18 +27,27 @@
  * @copyright  2020 Brain station 23 ltd <>  {@link https://brainstation-23.com/}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-defined('MOODLE_INTERNAL') || die();
-
-require_once ($CFG->dirroot . '/course/moodleform_mod.php');
-
 class mod_webgl_mod_form extends moodleform_mod {
+    /**
+     * Storage engine azure.
+     */
     const STORAGE_ENGINE_AZURE = 1;
 
+    /**
+     * Storage engine s3.
+     */
     const STORAGE_ENGINE_S3 = 2;
 
+    /**
+     * Storage engine s3 default location.
+     */
     const STORAGE_ENGINE_S3_DEFAULT_LOCATION = 'ap-southeast-1';
 
+    /**
+     * Definition function of the class.
+     *
+     * return void
+     */
     public function definition() {
         global $CFG, $DB;
         $mform = $this->_form;
@@ -33,7 +63,7 @@ class mod_webgl_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        // ... $mform->addHelpButton('name', 'appstreamname', 'webgl');
+        // ... $mform->addHelpButton('name', 'appstreamname', 'webgl').
 
         // Adding the standard "intro" and "introformat" fields.
         if ($CFG->branch >= 29) {
@@ -118,21 +148,21 @@ class mod_webgl_mod_form extends moodleform_mod {
         $mform->addElement('text', 'account_name', get_string('account_name', 'webgl'));
         $mform->setType('account_name', PARAM_TEXT);
         $mform->addHelpButton('account_name', 'account_name', 'webgl');
-        // $mform->addRule('account_name', null, 'required', null, 'client');
+        // ... $mform->addRule('account_name', null, 'required', null, 'client').
         $accountname = get_config('webgl', 'AccountName');
         $mform->setDefault('account_name', $accountname);
 
         $mform->addElement('text', 'account_key', get_string('account_key', 'webgl'));
         $mform->setType('account_key', PARAM_TEXT);
         $mform->addHelpButton('account_key', 'account_key', 'webgl');
-        // $mform->addRule('account_key', null, 'required', null, 'client');
+        // ... $mform->addRule('account_key', null, 'required', null, 'client').
         $accountkey = get_config('webgl', 'AccountKey');
         $mform->setDefault('account_key', $accountkey);
 
         $mform->addElement('text', 'container_name', get_string('container_name', 'webgl'));
         $mform->setType('container_name', PARAM_TEXT);
         $mform->addHelpButton('container_name', 'container_name', 'webgl');
-        // $mform->addRule('container_name', null, 'required', null, 'client');
+        // ... $mform->addRule('container_name', null, 'required', null, 'client').
         $containername = get_config('webgl', 'ContainerName');
         $mform->setDefault('container_name', $containername);
 
@@ -146,18 +176,18 @@ class mod_webgl_mod_form extends moodleform_mod {
         $mform->addElement('text', 'access_key', get_string('access_key', 'webgl'));
         $mform->setType('access_key', PARAM_TEXT);
         $mform->addHelpButton('access_key', 'access_key', 'webgl');
-        // $mform->addRule('access_key', null, 'required', null, 'client');
+        // ... $mform->addRule('access_key', null, 'required', null, 'client').
         $accesskey = get_config('webgl', 'access_key');
         $mform->setDefault('access_key', $accesskey);
 
         $mform->addElement('text', 'secret_key', get_string('secret_key', 'webgl'));
         $mform->setType('secret_key', PARAM_TEXT);
         $mform->addHelpButton('secret_key', 'secret_key', 'webgl');
-        // $mform->addRule('secret_key', null, 'required', null, 'client');
+        // ... $mform->addRule('secret_key', null, 'required', null, 'client').
         $secretkey = get_config('webgl', 'secret_key');
         $mform->setDefault('secret_key', $secretkey);
 
-        $endpointselect = require ('classes/possible_end_points.php');
+        $endpointselect = require('classes/possible_end_points.php');
         $mform->addElement('select', 'endpoint', get_string('endpoint', 'webgl'), $endpointselect);
         $mform->setDefault('endpoint', 's3.amazonaws.com'); // Default to US Endpoint.
 
@@ -184,6 +214,8 @@ class mod_webgl_mod_form extends moodleform_mod {
     }
 
     /**
+     * Validation function.
+     *
      * @param array $data
      * @param array $files
      * @return array

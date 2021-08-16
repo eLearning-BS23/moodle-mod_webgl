@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<libraries>
+    <library>
+        <location>vendor/composer/</location>
+        <name>Composer</name>
+        <version>6.5.2</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/guzzlehttp/guzzle</location>
+        <name>Guzzle</name>
+        <version>6.5.2</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/guzzlehttp/promises</location>
+        <name>Promises</name>
+        <version>1.7.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/guzzlehttp/psr7</location>
+        <name>PSR7</name>
+        <version>3.6.2</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/microsoft/azure-storage-blob</location>
+        <name>Azure Storage Blob</name>
+        <version>1.5.1</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/microsoft/azure-storage-common</location>
+        <name>Azure Storage Common</name>
+        <version>1.5.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/microsoft/azure-storage-queue</location>
+        <name>Azure Storage Queue</name>
+        <version>1.3.2</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/microsoft/azure-storage-table</location>
+        <name>Azure Storage Table</name>
+        <version>1.1.3</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/psr/http-message</location>
+        <name>PSR HTTP Message</name>
+        <version>1.0.1</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/ralouphie/getallheaders</location>
+        <name>Ralouphie Getallheaders</name>
+        <version>3.0.3</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/symfony/polyfill-intl-idn</location>
+        <name>Symfony Polyfill Intl Idn</name>
+        <version>v1.20.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/symfony/polyfill-intl-normalizer</location>
+        <name>Symfony Polyfill Intl Normalizer</name>
+        <version>v1.20.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+    <library>
+        <location>vendor/symfony/polyfill-php72</location>
+        <name>Symfony Polyfill php72</name>
+        <version>v1.20.0</version>
+        <license>MIT</license>
+        <licenseversion></licenseversion>
+    </library>
+</libraries>
