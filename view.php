@@ -24,11 +24,11 @@
 
 use core_course\output\activity_navigation;
 
-require_once (dirname(dirname(dirname(__FILE__))) . '/config.php');
-require_once (dirname(__FILE__) . '/lib.php');
-require_once (dirname(__FILE__) . '/classes/BlobStorage.php');
-$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
-$n = optional_param('n', 0, PARAM_INT); // ... webgl instance ID - it should be named as the first character of the module.
+require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/lib.php');
+require_once(dirname(__FILE__) . '/classes/BlobStorage.php');
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
+$n = optional_param('n', 0, PARAM_INT); // Webgl instance ID - it should be named as the first character of the module.
 
 if ($id) {
     $cm = get_coursemodule_from_id('webgl', $id, 0, false, MUST_EXIST);
@@ -61,62 +61,62 @@ $PAGE->set_cacheable(false);
 $PAGE->set_pagelayout('embedded');
 $context = context_course::instance($course->id);
 ?>
-<style>
-body {
-    display: block;
-    margin: 0 !important;
-}
+    <style>
+        body {
+            display: block;
+            margin: 0 !important;
+        }
 
-.webgl-iframe-content-loader {
-    background: #fff;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-}
+        .webgl-iframe-content-loader {
+            background: #fff;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+        }
 
-.iframe {
-    position: relative;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-}
+        .iframe {
+            position: relative;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
 
-.course-footer-nav {
-    position: relative;
-    left: 0;
-    bottom: 10%;
-    right: 0;
-    width: 100%;
-}
+        .course-footer-nav {
+            position: relative;
+            left: 0;
+            bottom: 10%;
+            right: 0;
+            width: 100%;
+        }
 
-hr {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    border: 0;
-    border-top: 0 !important;
-}
+        hr {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            border: 0;
+            border-top: 0 !important;
+        }
 
-#activity-link {
-    position: relative;
-    padding: 14px 20px 14px 20px;
-    display: inline-block;
-    text-align: center;
-    vertical-align: middle;
-    border-radius: 5px;
-    font-size: .85rem;
-    font-weight: 500;
-    line-height: 180%;
-    text-decoration: none;
-    -webkit-transition: all 350ms ease;
-    -o-transition: all 350ms ease;
-    transition: all 350ms ease;
-}
-</style>
+        #activity-link {
+            position: relative;
+            padding: 14px 20px 14px 20px;
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            border-radius: 5px;
+            font-size: .85rem;
+            font-weight: 500;
+            line-height: 180%;
+            text-decoration: none;
+            -webkit-transition: all 350ms ease;
+            -o-transition: all 350ms ease;
+            transition: all 350ms ease;
+        }
+    </style>
 <?php
 echo $OUTPUT->header();
 $iframe = '
@@ -186,7 +186,7 @@ if ($position < ($nummods - 1)) {
 $activitynav = new activity_navigation($prevmod, $nextmod, $activitylist);
 $renderer = $PAGE->get_renderer('core', 'course');
 ?>
-<div onclick="history.back()" style="position: absolute;
+    <div onclick="history.back()" style="position: absolute;
         left: 0;width:100%;
         height:30px;bottom: 0;
         background: #fff;
@@ -194,8 +194,8 @@ $renderer = $PAGE->get_renderer('core', 'course');
         text-decoration: none;
         font-size: 15px;
         border-radius: 4px;">
-    <?php echo $renderer->render($activitynav); ?>
-</div>
+        <?php echo $renderer->render($activitynav); ?>
+    </div>
 <?php
 echo '</div>';
 echo $OUTPUT->footer();
