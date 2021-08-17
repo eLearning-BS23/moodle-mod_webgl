@@ -155,12 +155,6 @@ function webgl_refresh_events($courseid = 0): bool {
             return true;
         }
     }
-    /*
-     foreach ($webgls as $webgl) {
-         Create a function such as the one below to deal with updating calendar events.
-         webgl_update_events($webgl);
-     }
-    */
 
     return true;
 }
@@ -191,7 +185,6 @@ function webgl_delete_instance($id): bool {
     } else {
         delete_container_blobs($webgl);
     }
-    /* webgl_grade_item_delete($webgl); */
 
     return true;
 }
