@@ -47,7 +47,7 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Webgl Module Upgrade function
  *
- * @param $oldversion
+ * @param int $oldversion
  * @return bool
  */
 function xmldb_webgl_upgrade($oldversion) {

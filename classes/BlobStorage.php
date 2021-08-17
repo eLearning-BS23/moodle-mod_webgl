@@ -48,8 +48,8 @@ function get_connection(string $accountname, string $accountkey) {
  * Create a new Blob
  *
  * @param BlobRestProxy $blobclient
- * @param $blobname
- * @param $content
+ * @param string $blobname
+ * @param string|resource $content
  * @param string $contetnttype
  * @param string $container
  */

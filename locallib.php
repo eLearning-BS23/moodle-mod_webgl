@@ -74,7 +74,9 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
         $endpoint = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir, $replacewith);
 
-        return ['index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . cloudstoragewebglcontentprefix($webgl) . '/index.html'];
+        return [
+            'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . cloudstoragewebglcontentprefix($webgl) . '/index.html'
+        ];
     } else {
         // Upload to Azure Blob storage.
         $blobclient = get_connection($webgl->account_name, $webgl->account_key);
@@ -252,7 +254,7 @@ function cloudstoragewebglcontentprefix(stdClass $webgl) {
 
         $bucket .= random_string(10);
 
-    } elseif ($bucketlength > 63) {
+    } else if ($bucketlength > 63) {
 
         $excitedlength = $bucketlength - 63;
 
@@ -273,7 +275,8 @@ function cloudstoragewebglcontentprefix(stdClass $webgl) {
  * @return array
  * @throws dml_exception
  */
-function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = S3::ACL_PRIVATE, string $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION) {
+function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = S3::ACL_PRIVATE,
+                          string   $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION) {
     list($s3, $endpoint) = get_s3_instance($webgl, false);
 
     $bucketobjectremoved = make_empty_s3_bucket($s3, $bucket);
@@ -322,7 +325,7 @@ function make_empty_s3_bucket(S3 $s3, string $bucket) {
 
         endforeach;
 
-        // Bucket exists
+        // Bucket exists.
         return true;
     }
 
@@ -405,7 +408,7 @@ function str_replace_first($haystack, $needle, $replace) {
 /**
  * Activity navigation.
  *
- * @param $PAGE
+ * @param moodle_page $PAGE
  * @return string
  * @throws coding_exception
  * @throws moodle_exception
