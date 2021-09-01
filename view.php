@@ -61,62 +61,62 @@ $PAGE->set_cacheable(false);
 $PAGE->set_pagelayout('embedded');
 $context = context_course::instance($course->id);
 ?>
-    <style>
-        body {
-            display: block;
-            margin: 0 !important;
-        }
-
-        .webgl-iframe-content-loader {
-            background: #fff;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .iframe {
-            position: relative;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-        }
-
-        .course-footer-nav {
-            position: relative;
-            left: 0;
-            bottom: 10%;
-            right: 0;
-            width: 100%;
-        }
-
-        hr {
-            margin-top: 2rem;
-            margin-bottom: 2rem;
-            border: 0;
-            border-top: 0 !important;
-        }
-
-        #activity-link {
-            position: relative;
-            padding: 14px 20px 14px 20px;
-            display: inline-block;
-            text-align: center;
-            vertical-align: middle;
-            border-radius: 5px;
-            font-size: .85rem;
-            font-weight: 500;
-            line-height: 180%;
-            text-decoration: none;
-            -webkit-transition: all 350ms ease;
-            -o-transition: all 350ms ease;
-            transition: all 350ms ease;
-        }
-    </style>
+    <!--    <style>-->
+    <!--        body {-->
+    <!--            display: block;-->
+    <!--            margin: 0 !important;-->
+    <!--        }-->
+    <!---->
+    <!--        .webgl-iframe-content-loader {-->
+    <!--            background: #fff;-->
+    <!--            position: absolute;-->
+    <!--            top: 0;-->
+    <!--            left: 0;-->
+    <!--            bottom: 0;-->
+    <!--            right: 0;-->
+    <!--            width: 100%;-->
+    <!--            height: 100%;-->
+    <!--        }-->
+    <!---->
+    <!--        .iframe {-->
+    <!--            position: relative;-->
+    <!--            top: 0;-->
+    <!--            left: 0;-->
+    <!--            right: 0;-->
+    <!--            width: 100%;-->
+    <!--        }-->
+    <!---->
+    <!--        .course-footer-nav {-->
+    <!--            position: relative;-->
+    <!--            left: 0;-->
+    <!--            bottom: 10%;-->
+    <!--            right: 0;-->
+    <!--            width: 100%;-->
+    <!--        }-->
+    <!---->
+    <!--        hr {-->
+    <!--            margin-top: 2rem;-->
+    <!--            margin-bottom: 2rem;-->
+    <!--            border: 0;-->
+    <!--            border-top: 0 !important;-->
+    <!--        }-->
+    <!---->
+    <!--        #activity-link {-->
+    <!--            position: relative;-->
+    <!--            padding: 14px 20px 14px 20px;-->
+    <!--            display: inline-block;-->
+    <!--            text-align: center;-->
+    <!--            vertical-align: middle;-->
+    <!--            border-radius: 5px;-->
+    <!--            font-size: .85rem;-->
+    <!--            font-weight: 500;-->
+    <!--            line-height: 180%;-->
+    <!--            text-decoration: none;-->
+    <!--            -webkit-transition: all 350ms ease;-->
+    <!--            -o-transition: all 350ms ease;-->
+    <!--            transition: all 350ms ease;-->
+    <!--        }-->
+    <!--    </style>-->
 <?php
 echo $OUTPUT->header();
 $iframe = '
