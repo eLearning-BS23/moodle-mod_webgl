@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once('classes/BlobStorage.php');
+require_once('BlobStorage.php');
 require_once('mod_form.php');
 
 /**
