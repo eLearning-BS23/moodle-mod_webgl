@@ -47,4 +47,4 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-download_container_blobs($webgl);
+webgl_download_container_blobs($webgl);

@@ -46,7 +46,7 @@ if ($ADMIN->fulltree) {
         get_string('secret_key', 'mod_webgl'),
         get_string('secret_key_help', 'mod_webgl'), get_config('s3', 'secret_key'), PARAM_TEXT, 50));
 
-    $choices = require('classes/possible_end_points.php');
+    $choices = require('possible_end_points.php');
     $settings->add(new admin_setting_configselect('webgl/endpoint',
         get_string('endpoint', 'mod_webgl'),
         get_string('endpoint_help', 'mod_webgl'), get_config('s3', 'endpoint'), $choices));

@@ -61,7 +61,7 @@ class mod_webgl_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-        
+
         // Adding the standard "intro" and "introformat" fields.
         if ($CFG->branch >= 29) {
             $this->standard_intro_elements();
@@ -184,7 +184,7 @@ class mod_webgl_mod_form extends moodleform_mod {
         $secretkey = get_config('webgl', 'secret_key');
         $mform->setDefault('secret_key', $secretkey);
 
-        $endpointselect = require('classes/possible_end_points.php');
+        $endpointselect = require('possible_end_points.php');
         $mform->addElement('select', 'endpoint', get_string('endpoint', 'webgl'), $endpointselect);
         $mform->setDefault('endpoint', 's3.amazonaws.com'); // Default to US Endpoint.
 

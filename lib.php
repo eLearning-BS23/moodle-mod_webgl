@@ -81,11 +81,11 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): 
     $webgl->timecreated = time();
     $webgl->id = $DB->insert_record('webgl', $webgl);
     $res = $mform->save_temp_file($elname);
-    $blobdatadetails = import_extract_upload_contents($webgl, $res);
-    $webgl = index_file_url($webgl, $blobdatadetails);
+    $blobdatadetails = webgl_import_extract_upload_contents($webgl, $res);
+    $webgl = webgl_index_file_url($webgl, $blobdatadetails);
     $DB->update_record('webgl', $webgl);
 
-    upload_zip_file($webgl, $mform, $elname, $res);
+    webgl_upload_zip_file($webgl, $mform, $elname, $res);
 
     if ($res) {
         @unlink($res);
@@ -116,12 +116,12 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
     $basefilename = $mform->get_new_filename($elname);
     if ($basefilename) {
         $res = $mform->save_temp_file('importfile');
-        $blobdatadetails = import_extract_upload_contents($webgl, $res);
-        $webgl = index_file_url($webgl, $blobdatadetails);
+        $blobdatadetails = webgl_import_extract_upload_contents($webgl, $res);
+        $webgl = webgl_index_file_url($webgl, $blobdatadetails);
 
         $webgl->webgl_file = $basefilename;
 
-        upload_zip_file($webgl, $mform, $elname, $res);
+        webgl_upload_zip_file($webgl, $mform, $elname, $res);
 
         if ($res) {
             @unlink($res);
@@ -181,9 +181,9 @@ function webgl_delete_instance($id): bool {
 
     $DB->delete_records('webgl', array('id' => $webgl->id));
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
-        delete_s3_bucket($webgl);
+        webgl_delete_s3_bucket($webgl);
     } else {
-        delete_container_blobs($webgl);
+        webgl_delete_container_blobs($webgl);
     }
 
     return true;

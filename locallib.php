@@ -35,7 +35,7 @@ require_once('mod_form.php');
  * @return array List of imported files.
  * @throws moodle_exception
  */
-function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): array {
+function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepath): array {
 
     $importtempdir = make_request_directory('webglcontentimport' . microtime(false));
 
@@ -68,18 +68,18 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
     // Upload to S3.
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
 
-        $replacewith = cloudstoragewebglcontentprefix($webgl);
+        $replacewith = webgl_cloud_storage_webgl_content_prefix($webgl);
 
         $bucket = $replacewith;
 
         $endpoint = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir, $replacewith);
 
         return [
-            'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . cloudstoragewebglcontentprefix($webgl) . '/index.html'
+            'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . webgl_cloud_storage_webgl_content_prefix($webgl) . '/index.html'
         ];
     } else {
         // Upload to Azure Blob storage.
-        $blobclient = get_connection($webgl->account_name, $webgl->account_key);
+        $blobclient = webgl_get_connection($webgl->account_name, $webgl->account_key);
 
         foreach ($filelist as $filename => $value):
 
@@ -87,15 +87,15 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
             if (!is_dir($cfile)) {
 
-                $replacewith = cloudstoragewebglcontentprefix($webgl);
+                $replacewith = webgl_cloud_storage_webgl_content_prefix($webgl);
 
-                $filename = str_replace_first($filename, '/', $replacewith);
+                $filename = webgl_str_replace_first($filename, '/', $replacewith);
 
                 $contetnttype = mime_content_type($cfile);
 
                 $content = fopen($cfile, "r");
 
-                upload_blob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
+                webgl_upload_blob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
 
                 if (is_resource($content)) {
 
@@ -106,7 +106,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
 
         endforeach;
 
-        return list_blobs($blobclient, $webgl);
+        return webgl_list_blobs($blobclient, $webgl);
     }
 
 }
@@ -122,7 +122,7 @@ function import_extract_upload_contents(stdClass $webgl, string $zipfilepath): a
  * @throws dml_exception
  */
 function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir, string $replacewith) {
-    list($s3, $endpoint) = s3_create_bucket($webgl, $bucket);
+    list($s3, $endpoint) = webgl_s3_create_bucket($webgl, $bucket);
 
     foreach ($filelist as $filename => $value):
 
@@ -130,7 +130,7 @@ function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtemp
 
         if (!is_dir($cfile)) {
 
-            $filename = str_replace_first($filename, '/', $replacewith);
+            $filename = webgl_str_replace_first($filename, '/', $replacewith);
 
             $s3->putObject($s3->inputFile($cfile), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ);
 
@@ -149,19 +149,19 @@ function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtemp
  * @param string $res
  * @throws dml_exception
  */
-function upload_zip_file($webgl, $mform, $elname, $res) {
+function webgl_upload_zip_file($webgl, $mform, $elname, $res) {
     if ($webgl->store_zip_file) {
 
         if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_AZURE) {
 
             $zipcontent = $mform->get_file_content($elname);
 
-            import_zip_contents($webgl, $zipcontent);
+            webgl_import_zip_contents($webgl, $zipcontent);
 
         } else {
-            list($s3, $endpoint) = get_s3_instance($webgl);
+            list($s3, $endpoint) = webgl_get_s3_instance($webgl);
 
-            $prefix = cloudstoragewebglcontentprefix($webgl);
+            $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
 
             $bucket = $prefix;
 
@@ -183,7 +183,7 @@ function upload_zip_file($webgl, $mform, $elname, $res) {
  * @return array
  * @throws dml_exception
  */
-function get_s3_instance(stdClass $webgl, $exceptionenabled = true) {
+function webgl_get_s3_instance(stdClass $webgl, $exceptionenabled = true) {
     $accesskey = empty($webgl->access_key) ? $webgl->access_key : get_config('webgl', 'access_key');
 
     $secretkey = empty($webgl->secret_key) ? $webgl->secret_key : get_config('webgl', 'secret_key');
@@ -237,7 +237,7 @@ function get_s3_instance(stdClass $webgl, $exceptionenabled = true) {
  * @param stdClass $webgl
  * @return string
  */
-function cloudstoragewebglcontentprefix(stdClass $webgl) {
+function webgl_cloud_storage_webgl_content_prefix(stdClass $webgl) {
     $hostname = gethostname();
 
     $bucket = "$hostname-course-$webgl->course" . "-module-id-$webgl->id";
@@ -275,11 +275,11 @@ function cloudstoragewebglcontentprefix(stdClass $webgl) {
  * @return array
  * @throws dml_exception
  */
-function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = S3::ACL_PRIVATE,
-                          string   $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION) {
-    list($s3, $endpoint) = get_s3_instance($webgl, false);
+function webgl_s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = S3::ACL_PRIVATE,
+                                string   $location = mod_webgl_mod_form::STORAGE_ENGINE_S3_DEFAULT_LOCATION) {
+    list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
 
-    $bucketobjectremoved = make_empty_s3_bucket($s3, $bucket);
+    $bucketobjectremoved = webgl_make_empty_s3_bucket($s3, $bucket);
 
     if (!$bucketobjectremoved) {
 
@@ -297,12 +297,12 @@ function s3_create_bucket(stdClass $webgl, string $bucket, string $visibility = 
  * @return S3
  * @throws dml_exception
  */
-function delete_s3_bucket(stdClass $webgl) {
-    list($s3, $endpoint) = get_s3_instance($webgl, false);
+function webgl_delete_s3_bucket(stdClass $webgl) {
+    list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
 
-    $bucket = cloudstoragewebglcontentprefix($webgl);
+    $bucket = webgl_cloud_storage_webgl_content_prefix($webgl);
 
-    make_empty_s3_bucket($s3, $bucket);
+    webgl_make_empty_s3_bucket($s3, $bucket);
 
     return $s3->deleteBucket($bucket);
 }
@@ -314,7 +314,7 @@ function delete_s3_bucket(stdClass $webgl) {
  * @param string $bucket
  * @return bool
  */
-function make_empty_s3_bucket(S3 $s3, string $bucket) {
+function webgl_make_empty_s3_bucket(S3 $s3, string $bucket) {
 
     $objects = $s3->getBucket($bucket);
 
@@ -340,16 +340,16 @@ function make_empty_s3_bucket(S3 $s3, string $bucket) {
  * @param string $content
  * @return void
  */
-function import_zip_contents(stdClass $webgl, string $content): void {
-    $blobclient = get_connection($webgl->account_name, $webgl->account_key);
+function webgl_import_zip_contents(stdClass $webgl, string $content): void {
+    $blobclient = webgl_get_connection($webgl->account_name, $webgl->account_key);
 
-    $prefix = cloudstoragewebglcontentprefix($webgl);
+    $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
 
     $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
 
     $contetnttype = "application/octet-stream";
 
-    upload_blob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
+    webgl_upload_blob($blobclient, $filename, $content, $contetnttype, $webgl->container_name);
 }
 
 /**
@@ -360,18 +360,18 @@ function import_zip_contents(stdClass $webgl, string $content): void {
  * @throws coding_exception
  * @throws moodle_exception
  */
-function download_container_blobs(stdClass $webgl): void {
-    $blobclient = get_connection($webgl->account_name, $webgl->account_key);
-    download_blobs($blobclient, $webgl);
+function webgl_download_container_blobs(stdClass $webgl): void {
+    $blobclient = webgl_get_connection($webgl->account_name, $webgl->account_key);
+    webgl_download_blobs($blobclient, $webgl);
 }
 
 /**
  * Delete azure blob container content.
  * @param stdClass $webgl
  */
-function delete_container_blobs(stdClass $webgl) {
-    $blobclient = get_connection($webgl->account_name, $webgl->account_key);
-    delete_blobs($blobclient, $webgl);
+function webgl_delete_container_blobs(stdClass $webgl) {
+    $blobclient = webgl_get_connection($webgl->account_name, $webgl->account_key);
+    webgl_delete_blobs($blobclient, $webgl);
 }
 
 /**
@@ -381,7 +381,7 @@ function delete_container_blobs(stdClass $webgl) {
  * @param array $blobdatadetails
  * @return stdClass
  */
-function index_file_url($webgl, $blobdatadetails) {
+function webgl_index_file_url($webgl, $blobdatadetails) {
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
         $webgl->index_file_url = $blobdatadetails['index'];
     } else {
@@ -398,7 +398,7 @@ function index_file_url($webgl, $blobdatadetails) {
  * @param string $replace
  * @return string|string[]
  */
-function str_replace_first($haystack, $needle, $replace) {
+function webgl_str_replace_first($haystack, $needle, $replace) {
     $pos = strpos($haystack, $needle);
     if ($pos !== false) {
         return substr_replace($haystack, $replace, 0, $pos);
