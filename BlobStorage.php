@@ -38,7 +38,7 @@ use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
  * @param string $accountkey
  * @return BlobRestProxy
  */
-function get_connection(string $accountname, string $accountkey) {
+function webgl_get_connection(string $accountname, string $accountkey) {
     $connectionstring =
         "DefaultEndpointsProtocol=https;AccountName=$accountname;AccountKey=$accountkey;EndpointSuffix=core.windows.net";
     return BlobRestProxy::createBlobService($connectionstring);
@@ -53,7 +53,7 @@ function get_connection(string $accountname, string $accountkey) {
  * @param string $contetnttype
  * @param string $container
  */
-function upload_blob(BlobRestProxy $blobclient, $blobname, $content, string $contetnttype, string $container) {
+function webgl_upload_blob(BlobRestProxy $blobclient, $blobname, $content, string $contetnttype, string $container) {
     try {
         $blobclient->createBlockBlob($container, $blobname, $content);
         $opts = new SetBlobPropertiesOptions();
@@ -75,14 +75,14 @@ function upload_blob(BlobRestProxy $blobclient, $blobname, $content, string $con
  * @throws coding_exception
  * @throws moodle_exception
  */
-function download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
+function webgl_download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
     $zipper = get_file_packer('application/zip');
     $temppath = make_request_directory() . DIRECTORY_SEPARATOR . $webgl
             ->webgl_file;
     try {
         // List blobs.
         $listblobsoptions = new ListBlobsOptions();
-        $prefix = cloudstoragewebglcontentprefix($webgl);
+        $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
         $listblobsoptions->setPrefix($prefix);
         // Setting max result to 1 is just to demonstrate the continuation token.
         // It is not the recommended value in a product environment.
@@ -91,8 +91,8 @@ function download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
         do {
             $bloblist = $blobclient->listBlobs($webgl->container_name, $listblobsoptions);
             foreach ($bloblist->getBlobs() as $blob) {
-                $filename = str_replace_first($blob->getName(), '/', "");
-                $stream = download_blob_stream_content($blobclient, $webgl->container_name, $blob->getName());
+                $filename = webgl_str_replace_first($blob->getName(), '/', "");
+                $stream = webgl_download_blob_stream_content($blobclient, $webgl->container_name, $blob->getName());
                 $stringarchive[$filename] = [stream_get_contents($stream)];
                 if ($zipper->archive_to_pathname($stringarchive, $temppath)) {
                     echo 'OKay' . PHP_EOL;
@@ -117,12 +117,12 @@ function download_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
  * @param stdClass $webgl
  * @return array
  */
-function list_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
+function webgl_list_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
     $contentlist = array();
     try {
         // List blobs.
         $listblobsoptions = new ListBlobsOptions();
-        $prefix = cloudstoragewebglcontentprefix($webgl);
+        $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
         $listblobsoptions->setPrefix($prefix);
         // Setting max result to 1 is just to demonstrate the continuation token.
         // It is not the recommended value in a product environment.
@@ -156,11 +156,11 @@ function list_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
  * @param stdClass $webgl
  * @return void
  */
-function delete_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
+function webgl_delete_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
     try {
         // List blobs.
         $listblobsoptions = new ListBlobsOptions();
-        $prefix = cloudstoragewebglcontentprefix($webgl);
+        $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
         $listblobsoptions->setPrefix($prefix);
 
         // Setting max result to 1 is just to demonstrate the continuation token.
@@ -171,7 +171,7 @@ function delete_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
             $bloblist = $blobclient->listBlobs($webgl->container_name,
                 $listblobsoptions);
             foreach ($bloblist->getBlobs() as $blob) {
-                delete_blob($blobclient, $webgl->container_name, $blob->getName());
+                webgl_delete_blob($blobclient, $webgl->container_name, $blob->getName());
             }
 
             $listblobsoptions->setContinuationToken($bloblist
@@ -192,7 +192,7 @@ function delete_blobs(BlobRestProxy $blobclient, stdClass $webgl) {
  * @param string $blobname
  * @return void
  */
-function delete_blob(BlobRestProxy $blobclient, string $container, string $blobname) {
+function webgl_delete_blob(BlobRestProxy $blobclient, string $container, string $blobname) {
     $blobclient->deleteBlob($container, $blobname);
 }
 
@@ -203,7 +203,7 @@ function delete_blob(BlobRestProxy $blobclient, string $container, string $blobn
  * @param string $blob
  * @return resource|null
  */
-function download_blob_stream_content(BlobRestProxy $blobclient, string $container, string $blob) {
+function webgl_download_blob_stream_content(BlobRestProxy $blobclient, string $container, string $blob) {
     try {
         return $blobclient->getBlob($container, $blob)
             ->getContentStream();

@@ -28,7 +28,7 @@ require_once($CFG->libdir . '/setuplib.php');
 
 require_once(dirname(__FILE__) . '/lib.php');
 
-require_once(dirname(__FILE__) . '/classes/BlobStorage.php');
+require_once(dirname(__FILE__) . '/BlobStorage.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course_module ID, or.
 $n = optional_param('n', 0, PARAM_INT); // ... webgl instance ID - it should be named as the first character of the module.
@@ -47,4 +47,4 @@ if ($id) {
 
 require_login($course, true, $cm);
 
-download_container_blobs($webgl);
+webgl_download_container_blobs($webgl);
