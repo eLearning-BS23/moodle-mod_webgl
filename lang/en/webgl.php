@@ -94,4 +94,6 @@ $string['before_description_help'] = 'By default WebGL content will show after '
 $string['storage'] = 'Storage details';
 $string['storage'] = 'Storage details';
 
+$string['privacy:metadata'] = 'The mod_webgl plugin does not store any personal data.';
+
 // END: Fields in the admin form.
