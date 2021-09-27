@@ -38,6 +38,11 @@ class mod_webgl_mod_form extends moodleform_mod {
     const STORAGE_ENGINE_S3 = 2;
 
     /**
+     * Storage engine local disk.
+     */
+    const STORAGE_ENGINE_LOCAL_DISK = 3;
+
+    /**
      * Storage engine s3 default location.
      */
     const STORAGE_ENGINE_S3_DEFAULT_LOCATION = 'ap-southeast-1';
@@ -136,6 +141,7 @@ class mod_webgl_mod_form extends moodleform_mod {
         $mform->addElement('select', 'storage_engine', get_string('storage_engine', 'webgl'), [
             1 => 'Azure BLOB storage',
             2 => 'AWS Simple Cloud Storage (S3)',
+            3 => get_string('local_file_system','mod_webgl'),
         ]);
         $mform->addHelpButton('storage_engine', 'storage_engine', 'webgl');
         $mform->addRule('storage_engine', null, 'required', null, 'client');
@@ -166,9 +172,15 @@ class mod_webgl_mod_form extends moodleform_mod {
         $mform->hideIf('account_name', 'storage_engine', 'eq', '2');
         $mform->hideIf('account_key', 'storage_engine', 'eq', '2');
         $mform->hideIf('container_name', 'storage_engine', 'eq', '2');
+        $mform->hideIf('account_name', 'storage_engine', 'eq', '3');
+        $mform->hideIf('account_key', 'storage_engine', 'eq', '3');
+        $mform->hideIf('container_name', 'storage_engine', 'eq', '3');
         $mform->disabledIf('account_name', 'storage_engine', 'eq', '2');
         $mform->disabledIf('account_key', 'storage_engine', 'eq', '2');
         $mform->disabledIf('container_name', 'storage_engine', 'eq', '2');
+        $mform->disabledIf('account_name', 'storage_engine', 'eq', '3');
+        $mform->disabledIf('account_key', 'storage_engine', 'eq', '3');
+        $mform->disabledIf('container_name', 'storage_engine', 'eq', '3');
 
         $mform->addElement('text', 'access_key', get_string('access_key', 'webgl'));
         $mform->setType('access_key', PARAM_TEXT);
@@ -194,6 +206,12 @@ class mod_webgl_mod_form extends moodleform_mod {
         $mform->disabledIf('access_key', 'storage_engine', 'eq', '1');
         $mform->disabledIf('secret_key', 'storage_engine', 'eq', '1');
         $mform->disabledIf('endpoint', 'storage_engine', 'eq', '1');
+        $mform->hideIf('access_key', 'storage_engine', 'eq', '3');
+        $mform->hideIf('secret_key', 'storage_engine', 'eq', '3');
+        $mform->hideIf('endpoint', 'storage_engine', 'eq', '3');
+        $mform->disabledIf('access_key', 'storage_engine', 'eq', '3');
+        $mform->disabledIf('secret_key', 'storage_engine', 'eq', '3');
+        $mform->disabledIf('endpoint', 'storage_engine', 'eq', '3');
 
         $mform->addElement('advcheckbox', 'store_zip_file', get_string('store_zip_file', 'webgl'));
         $mform->addHelpButton('store_zip_file', 'store_zip_file', 'webgl');

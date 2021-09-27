@@ -77,7 +77,11 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
         return [
             'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . webgl_cloud_storage_webgl_content_prefix($webgl) . '/index.html'
         ];
-    } else {
+    }elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
+        $zip = new zip_packer();
+        return $zip->extract_to_storage($zipfilepath,$webgl->coursemodule,'mod_webgl','webglcontent',0,'/');
+    }
+    else {
         // Upload to Azure Blob storage.
         $blobclient = webgl_get_connection($webgl->account_name, $webgl->account_key);
 
@@ -110,6 +114,7 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
     }
 
 }
+
 
 /**
  * Upload to s3.
@@ -384,6 +389,13 @@ function webgl_delete_container_blobs(stdClass $webgl) {
 function webgl_index_file_url($webgl, $blobdatadetails) {
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
         $webgl->index_file_url = $blobdatadetails['index'];
+    }elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
+        foreach ($blobdatadetails as $blob =>$response):
+            $filename = explode('/',$blob);
+        if (end($filename) == 'index.html'){
+            $webgl->index_file_url =$blob;
+        }
+        endforeach;
     } else {
         $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
     }

@@ -85,7 +85,7 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): 
     $webgl = webgl_index_file_url($webgl, $blobdatadetails);
     $DB->update_record('webgl', $webgl);
 
-    webgl_upload_zip_file($webgl, $mform, $elname, $res);
+//    webgl_upload_zip_file($webgl, $mform, $elname, $res);
 
     if ($res) {
         @unlink($res);

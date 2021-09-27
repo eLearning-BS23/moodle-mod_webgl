@@ -92,7 +92,7 @@ $string['before_description'] = 'Show WebGL content before ' . $moduleintro . ' 
 $string['before_description_help'] = 'By default WebGL content will show after ' . $moduleintro . ' section. Check the checkbox If you want to show content before ' . $moduleintro . ' section ';
 
 $string['storage'] = 'Storage details';
-$string['storage'] = 'Storage details';
+$string['local_file_system'] = 'Default file system';
 
 $string['privacy:metadata'] = 'The mod_webgl plugin does not store any personal data.';
 
