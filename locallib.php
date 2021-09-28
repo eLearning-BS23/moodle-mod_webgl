@@ -77,9 +77,18 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
         return [
             'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . webgl_cloud_storage_webgl_content_prefix($webgl) . '/index.html'
         ];
-    }elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
+    }
+    elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
+        $context = context_module::instance($webgl->coursemodule);
         $zip = new zip_packer();
-        return $zip->extract_to_storage($zipfilepath,$webgl->coursemodule,'mod_webgl','webglcontent',0,'/');
+        $extractedfiles = $zip->extract_to_storage($zipfilepath,$context->id,'mod_webgl','content', $webgl->id,'/');
+        if (!$extractedfiles){
+            throw new moodle_exception('invalidcontent','mod_webgl');
+        }
+        $moodle_url = moodle_url::make_pluginfile_url($context->id,'mod_webgl','content',$webgl->id,'/'.$dirname,'index.html');
+        return [
+            'index' => $moodle_url->out()
+        ];
     }
     else {
         // Upload to Azure Blob storage.
@@ -163,7 +172,7 @@ function webgl_upload_zip_file($webgl, $mform, $elname, $res) {
 
             webgl_import_zip_contents($webgl, $zipcontent);
 
-        } else {
+        } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
             list($s3, $endpoint) = webgl_get_s3_instance($webgl);
 
             $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
@@ -176,6 +185,8 @@ function webgl_upload_zip_file($webgl, $mform, $elname, $res) {
                 'Content-Type' => "application/octet-stream",
             ]);
 
+        }else{
+            //TODO: Implement Moodle file system zip file import
         }
     }
 }
@@ -390,12 +401,7 @@ function webgl_index_file_url($webgl, $blobdatadetails) {
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
         $webgl->index_file_url = $blobdatadetails['index'];
     }elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
-        foreach ($blobdatadetails as $blob =>$response):
-            $filename = explode('/',$blob);
-        if (end($filename) == 'index.html'){
-            $webgl->index_file_url =$blob;
-        }
-        endforeach;
+        $webgl->index_file_url = $blobdatadetails['index'];
     } else {
         $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];
     }

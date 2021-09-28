@@ -51,6 +51,15 @@ if ($ADMIN->fulltree) {
         get_string('endpoint', 'mod_webgl'),
         get_string('endpoint_help', 'mod_webgl'), get_config('s3', 'endpoint'), $choices));
 
+    $storage_engines = [
+        1 => 'Azure BLOB storage',
+        2 => 'AWS Simple Cloud Storage (S3)',
+        3 => get_string('local_file_system','mod_webgl'),
+    ];
+    $settings->add(new admin_setting_configselect('webgl/storage_engine',
+        get_string('storage_engine', 'mod_webgl'),
+        get_string('storage_engine_help', 'mod_webgl'), '3', $storage_engines));
+
     $settings->add(new admin_setting_configcheckbox('webgl/store_zip_file',
         get_string('store_zip_file', 'mod_webgl'),
         get_string('store_zip_file_help', 'mod_webgl'), 1));

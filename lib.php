@@ -77,6 +77,7 @@ function webgl_supports(string $feature): ?bool {
 function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): int {
     global $DB;
     $elname = 'importfile';
+
     $webgl->webgl_file = $mform->get_new_filename('importfile');
     $webgl->timecreated = time();
     $webgl->id = $DB->insert_record('webgl', $webgl);
@@ -85,7 +86,7 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): 
     $webgl = webgl_index_file_url($webgl, $blobdatadetails);
     $DB->update_record('webgl', $webgl);
 
-//    webgl_upload_zip_file($webgl, $mform, $elname, $res);
+    webgl_upload_zip_file($webgl, $mform, $elname, $res);
 
     if ($res) {
         @unlink($res);
@@ -456,6 +457,7 @@ function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea
  *
  * @package mod_webgl
  */
+
 function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = array()) {
     global $DB, $CFG;
 
@@ -465,7 +467,15 @@ function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $force
 
     require_login($course, true, $cm);
 
-    send_file_not_found();
+    $relativepath = implode('/', $args);
+    $fullpath = '/' . $context->id . '/mod_webgl/content/' . $relativepath;
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, $forcedownload);
 }
 
 /* Navigation API */
