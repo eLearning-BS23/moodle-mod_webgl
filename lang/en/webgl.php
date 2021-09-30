@@ -78,6 +78,12 @@ $string['endpoint_error'] = 'Endpoint should not be empty while storage engine i
 $string['endpoint'] = 'S3 endpoint';
 $string['endpoint_help'] = 'AWS s3 endpoint';
 
+$string['bucket_name'] = 'AWS S3 Bucket Name';
+$string['bucket_name_help'] = 'AWS s3 bucket name must be unique';
+
+$string['cloudfront_url'] = 'Cloud Front URL';
+$string['cloudfront_url_help'] = 'Cloud Front URL';
+
 $string['store_zip_file'] = 'Upload zip file';
 $string['store_zip_file_help'] = 'Also upload Uploaded zip file to Azure Blob storage.';
 

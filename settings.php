@@ -51,6 +51,14 @@ if ($ADMIN->fulltree) {
         get_string('endpoint', 'mod_webgl'),
         get_string('endpoint_help', 'mod_webgl'), get_config('s3', 'endpoint'), $choices));
 
+    $settings->add(new admin_setting_configtext('webgl/bucket_name',
+        get_string('bucket_name', 'mod_webgl'),
+        get_string('bucket_name_help', 'mod_webgl'), '', PARAM_TEXT, 90));
+
+    $settings->add(new admin_setting_configcheckbox('webgl/cloudfront_url',
+        get_string('cloudfront_url', 'mod_webgl'),
+        get_string('cloudfront_url_help', 'mod_webgl'), 1));
+
     $storage_engines = [
         1 => 'Azure BLOB storage',
         2 => 'AWS Simple Cloud Storage (S3)',
