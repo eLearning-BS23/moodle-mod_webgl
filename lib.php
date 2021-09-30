@@ -177,16 +177,21 @@ function webgl_delete_instance($id): bool {
     if (!$webgl = $DB->get_record('webgl', array('id' => $id))) {
         return false;
     }
-
+    $course = $DB->get_record('course', array('id' => $webgl->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('webgl', $webgl->id, $course->id, false, MUST_EXIST);
     // Delete any dependent records here.
 
+    $webgl->coursemodule = $cm->id;
     $DB->delete_records('webgl', array('id' => $webgl->id));
+
+
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
         webgl_delete_s3_bucket($webgl);
+    } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK) {
+        webgl_delete_from_file_system($webgl);
     } else {
         webgl_delete_container_blobs($webgl);
     }
-
     return true;
 }
 

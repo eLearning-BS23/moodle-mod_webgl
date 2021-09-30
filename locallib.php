@@ -369,6 +369,31 @@ function webgl_import_zip_contents(stdClass $webgl, string $content): void {
 }
 
 /**
+ * Delete from File System API.
+ *
+ * @param stdClass $webgl
+ * @return void
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function webgl_delete_from_file_system(stdClass $webgl): void {
+    $context = context_module::instance($webgl->coursemodule);
+    // Get file
+    $fs = get_file_storage();
+    //$file = $fs->get_file($context->id,'mod_webgl','content', $webgl->id,'/'.$dirname,'index.html');
+    $files = $fs->get_area_files($context->id, 'mod_webgl', 'content', $webgl->id, 'id ASC');
+    foreach ($files as $file) {
+        $file->delete();
+    }
+
+    // Delete it if it exists
+//    if ($file) {
+//        $file->delete();
+//    }
+}
+
+
+/**
  * Download container blobs.
  *
  * @param stdClass $webgl
