@@ -67,15 +67,11 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
 
     // Upload to S3.
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
-
-        $replacewith = webgl_cloud_storage_webgl_content_prefix($webgl);
-
-        $bucket = $replacewith;
-
-        $endpoint = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir, $replacewith);
+        $bucket = get_config('webgl', 'bucket_name');
+        list($endpoint, $foldername) = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir);
 
         return [
-            'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . webgl_cloud_storage_webgl_content_prefix($webgl) . '/index.html'
+            'index' => "https://$bucket." . $endpoint . '/' . "$foldername/" . array_key_first($filelist) . 'index.html'
         ];
     }
     elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
@@ -135,23 +131,20 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
  * @return mixed
  * @throws dml_exception
  */
-function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir, string $replacewith) {
-    list($s3, $endpoint) = webgl_s3_create_bucket($webgl, $bucket);
+function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir) {
+    list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
 
+    // Folder name for the webgl content e.g. webgl-id-2-course-id-3.
+    $foldername = "webgl-id-" . $webgl->id . "-course-id-" . $webgl->course;
     foreach ($filelist as $filename => $value):
 
         $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
 
         if (!is_dir($cfile)) {
-
-            $filename = webgl_str_replace_first($filename, '/', $replacewith);
-
-            $s3->putObject($s3->inputFile($cfile), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ);
-
+            $s3->putObject($s3->inputFile($cfile), $bucket, $foldername . '/' . $filename, S3::ACL_PUBLIC_READ);
         }
-
     endforeach;
-    return $endpoint;
+    return [$endpoint, $foldername];
 }
 
 /**
