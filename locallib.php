@@ -167,13 +167,10 @@ function webgl_upload_zip_file($webgl, $mform, $elname, $res) {
         } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
             list($s3, $endpoint) = webgl_get_s3_instance($webgl);
 
-            $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
-
-            $bucket = $prefix;
-
-            $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
-
-            $s3->putObject($s3->inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
+            $bucket = get_config('webgl', 'bucket_name');
+            $filename = $webgl->webgl_file;
+            $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
+            $s3->putObject($s3->inputFile($res), $bucket, $foldername . '/' . $filename, S3::ACL_PUBLIC_READ, [
                 'Content-Type' => "application/octet-stream",
             ]);
 
@@ -331,21 +328,11 @@ function webgl_delete_from_s3(stdClass $webgl) {
     //var_dump($objects, $foldername);
     if (is_array($objects)) {
         foreach ($objects as $key => $object):
-            //var_dump($key);
-            //var_dump($object);
             $dirname = explode('/', $key);
-            //var_dump($dirname[0]);
-            //$s3->deleteObject($bucket, $key);
             if($dirname[0] == $foldername) {
                 // Delete folder from the bucket.
-                var_dump($key);
-                var_dump($dirname[0]);
-                var_dump($foldername);
                 $s3->deleteObject($bucket, $key);
-//                var_dump($key, $object);
-
             }
-
         endforeach;
         return true;
     }
