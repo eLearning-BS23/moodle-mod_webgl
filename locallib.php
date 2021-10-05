@@ -120,7 +120,6 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
 
 }
 
-
 /**
  * Upload to s3.
  * @param stdClass $webgl
@@ -134,8 +133,8 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
 function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir) {
     list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
 
-    // Folder name for the webgl content e.g. webgl-id-2-course-id-3.
-    $foldername = "webgl-id-" . $webgl->id . "-course-id-" . $webgl->course;
+    // Folder name for the webgl content.
+    $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
     foreach ($filelist as $filename => $value):
 
         $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
@@ -316,6 +315,42 @@ function webgl_delete_s3_bucket(stdClass $webgl) {
     return $s3->deleteBucket($bucket);
 }
 
+/**
+ * Delete object from s3 bucket.
+ *
+ * @param stdClass $webgl
+ * @return boolean
+ * @throws dml_exception
+ */
+function webgl_delete_from_s3(stdClass $webgl) {
+    list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
+    $bucket = get_config('webgl', 'bucket_name');
+    $objects = $s3->getBucket($bucket);
+
+    $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
+    //var_dump($objects, $foldername);
+    if (is_array($objects)) {
+        foreach ($objects as $key => $object):
+            //var_dump($key);
+            //var_dump($object);
+            $dirname = explode('/', $key);
+            //var_dump($dirname[0]);
+            //$s3->deleteObject($bucket, $key);
+            if($dirname[0] == $foldername) {
+                // Delete folder from the bucket.
+                var_dump($key);
+                var_dump($dirname[0]);
+                var_dump($foldername);
+                $s3->deleteObject($bucket, $key);
+//                var_dump($key, $object);
+
+            }
+
+        endforeach;
+        return true;
+    }
+    return false;
+}
 /**
  * Make empty s3 bucket.
  *

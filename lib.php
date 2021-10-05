@@ -86,7 +86,7 @@ function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): 
     $webgl = webgl_index_file_url($webgl, $blobdatadetails);
     $DB->update_record('webgl', $webgl);
 
-    // webgl_upload_zip_file($webgl, $mform, $elname, $res);
+    //webgl_upload_zip_file($webgl, $mform, $elname, $res);
 
     if ($res) {
         @unlink($res);
@@ -179,14 +179,12 @@ function webgl_delete_instance($id): bool {
     }
     $course = $DB->get_record('course', array('id' => $webgl->course), '*', MUST_EXIST);
     $cm = get_coursemodule_from_instance('webgl', $webgl->id, $course->id, false, MUST_EXIST);
-    // Delete any dependent records here.
-
     $webgl->coursemodule = $cm->id;
     $DB->delete_records('webgl', array('id' => $webgl->id));
 
-
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
-        webgl_delete_s3_bucket($webgl);
+        // webgl_delete_s3_bucket($webgl);
+        webgl_delete_from_s3($webgl);
     } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK) {
         webgl_delete_from_file_system($webgl);
     } else {
