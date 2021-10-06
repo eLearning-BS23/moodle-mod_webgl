@@ -114,6 +114,7 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
     // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;
+    webgl_delete_from_s3($webgl);
     $basefilename = $mform->get_new_filename($elname);
     if ($basefilename) {
         $res = $mform->save_temp_file('importfile');
