@@ -74,6 +74,7 @@ An WebGL instance can be added to a course in the same way as any other activity
 1. Turn editing on
 2. Click 'Add an activity or resource'
 3. Select "WebGL"
+
 ![activity-selection](https://user-images.githubusercontent.com/72008371/136257457-995b8049-17d4-4a38-84da-afbf43444b6f.png)
 
 
