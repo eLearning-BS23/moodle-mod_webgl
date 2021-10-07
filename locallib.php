@@ -65,8 +65,8 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
         throw new moodle_exception('errorimport', 'mod_webgl');
     }
 
-    // Upload to S3.
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
+        // Upload to S3.
         $bucket = get_config('webgl', 'bucket_name');
         list($endpoint, $foldername) = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir);
 
@@ -75,6 +75,7 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
         ];
     }
     elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
+        // Upload to local file system API.
         $context = context_module::instance($webgl->coursemodule);
         $zip = new zip_packer();
         $extractedfiles = $zip->extract_to_storage($zipfilepath,$context->id,'mod_webgl','content', $webgl->id,'/');
@@ -133,7 +134,7 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
 function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir) {
     list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
 
-    // Folder name for the webgl content.
+    // Folder name for the webgl content in AWS S3.
     $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
     foreach ($filelist as $filename => $value):
 
@@ -174,8 +175,8 @@ function webgl_upload_zip_file($webgl, $mform, $elname, $res) {
                 'Content-Type' => "application/octet-stream",
             ]);
 
-        }else{
-            //TODO: Implement Moodle file system zip file import
+        } else {
+            // TODO: Implement Moodle file system zip file import.
         }
     }
 }
@@ -325,7 +326,6 @@ function webgl_delete_from_s3(stdClass $webgl) {
     $objects = $s3->getBucket($bucket);
 
     $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
-    //var_dump($objects, $foldername);
     if (is_array($objects)) {
         foreach ($objects as $key => $object):
             $dirname = explode('/', $key);
@@ -338,6 +338,7 @@ function webgl_delete_from_s3(stdClass $webgl) {
     }
     return false;
 }
+
 /**
  * Make empty s3 bucket.
  *
@@ -348,12 +349,9 @@ function webgl_delete_from_s3(stdClass $webgl) {
 function webgl_make_empty_s3_bucket(S3 $s3, string $bucket) {
 
     $objects = $s3->getBucket($bucket);
-
     if (is_array($objects)) {
         foreach ($objects as $key => $object):
-
             $s3->deleteObject($bucket, $key);
-
         endforeach;
 
         // Bucket exists.
@@ -361,7 +359,6 @@ function webgl_make_empty_s3_bucket(S3 $s3, string $bucket) {
     }
 
     return false;
-
 }
 
 /**
@@ -393,20 +390,13 @@ function webgl_import_zip_contents(stdClass $webgl, string $content): void {
  */
 function webgl_delete_from_file_system(stdClass $webgl): void {
     $context = context_module::instance($webgl->coursemodule);
-    // Get file
+
     $fs = get_file_storage();
-    //$file = $fs->get_file($context->id,'mod_webgl','content', $webgl->id,'/'.$dirname,'index.html');
     $files = $fs->get_area_files($context->id, 'mod_webgl', 'content', $webgl->id, 'id ASC');
     foreach ($files as $file) {
         $file->delete();
     }
-
-    // Delete it if it exists
-//    if ($file) {
-//        $file->delete();
-//    }
 }
-
 
 /**
  * Download container blobs.

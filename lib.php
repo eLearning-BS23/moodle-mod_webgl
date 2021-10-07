@@ -184,7 +184,6 @@ function webgl_delete_instance($id): bool {
     $DB->delete_records('webgl', array('id' => $webgl->id));
 
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
-        // webgl_delete_s3_bucket($webgl);
         webgl_delete_from_s3($webgl);
     } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK) {
         webgl_delete_from_file_system($webgl);

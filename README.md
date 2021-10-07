@@ -8,6 +8,17 @@ in a course as an activity. Administrator can upload the webgl game in the follo
  - Moodle Local File System API
  
 We are constantly improving the plugin, so stay tuned for upcoming versions.
+### Features
+- Easy to use.
+- Full-page webgl content load.
+- Support Azure BLOB storage webGL content upload.
+- Support Amazon Simple Storage Service (S3) webGL content upload.
+- Support webgl zip file upload too.
+- Option to download content for further use.
+- Support moodle local file system api for storing and serving webgl file
+
+
+
 
 
 ## Dependency: [S3 repository](https://docs.moodle.org/311/en/Amazon_S3_repository) 
