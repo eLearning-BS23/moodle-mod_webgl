@@ -67,17 +67,26 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
 
     // Upload to S3.
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
-
-        $replacewith = webgl_cloud_storage_webgl_content_prefix($webgl);
-
-        $bucket = $replacewith;
-
-        $endpoint = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir, $replacewith);
+        $bucket = get_config('webgl', 'bucket_name');
+        list($endpoint, $foldername) = webgl_s3_upload($webgl, $bucket, $filelist, $importtempdir);
 
         return [
-            'index' => "https://$endpoint/" . "$bucket/" . $endpoint . '/' . webgl_cloud_storage_webgl_content_prefix($webgl) . '/index.html'
+            'index' => "https://$bucket." . $endpoint . '/' . "$foldername/" . array_key_first($filelist) . 'index.html'
         ];
-    } else {
+    }
+    elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
+        $context = context_module::instance($webgl->coursemodule);
+        $zip = new zip_packer();
+        $extractedfiles = $zip->extract_to_storage($zipfilepath,$context->id,'mod_webgl','content', $webgl->id,'/');
+        if (!$extractedfiles){
+            throw new moodle_exception('invalidcontent','mod_webgl');
+        }
+        $moodle_url = moodle_url::make_pluginfile_url($context->id,'mod_webgl','content',$webgl->id,'/'.$dirname,'index.html');
+        return [
+            'index' => $moodle_url->out()
+        ];
+    }
+    else {
         // Upload to Azure Blob storage.
         $blobclient = webgl_get_connection($webgl->account_name, $webgl->account_key);
 
@@ -121,23 +130,20 @@ function webgl_import_extract_upload_contents(stdClass $webgl, string $zipfilepa
  * @return mixed
  * @throws dml_exception
  */
-function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir, string $replacewith) {
-    list($s3, $endpoint) = webgl_s3_create_bucket($webgl, $bucket);
+function webgl_s3_upload(stdClass $webgl, string $bucket, $filelist, $importtempdir) {
+    list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
 
+    // Folder name for the webgl content.
+    $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
     foreach ($filelist as $filename => $value):
 
         $cfile = $importtempdir . DIRECTORY_SEPARATOR . $filename;
 
         if (!is_dir($cfile)) {
-
-            $filename = webgl_str_replace_first($filename, '/', $replacewith);
-
-            $s3->putObject($s3->inputFile($cfile), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ);
-
+            $s3->putObject($s3->inputFile($cfile), $bucket, $foldername . '/' . $filename, S3::ACL_PUBLIC_READ);
         }
-
     endforeach;
-    return $endpoint;
+    return [$endpoint, $foldername];
 }
 
 /**
@@ -158,19 +164,18 @@ function webgl_upload_zip_file($webgl, $mform, $elname, $res) {
 
             webgl_import_zip_contents($webgl, $zipcontent);
 
-        } else {
+        } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
             list($s3, $endpoint) = webgl_get_s3_instance($webgl);
 
-            $prefix = webgl_cloud_storage_webgl_content_prefix($webgl);
-
-            $bucket = $prefix;
-
-            $filename = $prefix . DIRECTORY_SEPARATOR . $webgl->webgl_file;
-
-            $s3->putObject($s3->inputFile($res), $bucket, $endpoint . '/' . $filename, S3::ACL_PUBLIC_READ, [
+            $bucket = get_config('webgl', 'bucket_name');
+            $filename = $webgl->webgl_file;
+            $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
+            $s3->putObject($s3->inputFile($res), $bucket, $foldername . '/' . $filename, S3::ACL_PUBLIC_READ, [
                 'Content-Type' => "application/octet-stream",
             ]);
 
+        }else{
+            //TODO: Implement Moodle file system zip file import
         }
     }
 }
@@ -308,6 +313,32 @@ function webgl_delete_s3_bucket(stdClass $webgl) {
 }
 
 /**
+ * Delete object from s3 bucket.
+ *
+ * @param stdClass $webgl
+ * @return boolean
+ * @throws dml_exception
+ */
+function webgl_delete_from_s3(stdClass $webgl) {
+    list($s3, $endpoint) = webgl_get_s3_instance($webgl, false);
+    $bucket = get_config('webgl', 'bucket_name');
+    $objects = $s3->getBucket($bucket);
+
+    $foldername = webgl_cloud_storage_webgl_content_prefix($webgl);
+    //var_dump($objects, $foldername);
+    if (is_array($objects)) {
+        foreach ($objects as $key => $object):
+            $dirname = explode('/', $key);
+            if($dirname[0] == $foldername) {
+                // Delete folder from the bucket.
+                $s3->deleteObject($bucket, $key);
+            }
+        endforeach;
+        return true;
+    }
+    return false;
+}
+/**
  * Make empty s3 bucket.
  *
  * @param S3 $s3
@@ -353,6 +384,31 @@ function webgl_import_zip_contents(stdClass $webgl, string $content): void {
 }
 
 /**
+ * Delete from File System API.
+ *
+ * @param stdClass $webgl
+ * @return void
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function webgl_delete_from_file_system(stdClass $webgl): void {
+    $context = context_module::instance($webgl->coursemodule);
+    // Get file
+    $fs = get_file_storage();
+    //$file = $fs->get_file($context->id,'mod_webgl','content', $webgl->id,'/'.$dirname,'index.html');
+    $files = $fs->get_area_files($context->id, 'mod_webgl', 'content', $webgl->id, 'id ASC');
+    foreach ($files as $file) {
+        $file->delete();
+    }
+
+    // Delete it if it exists
+//    if ($file) {
+//        $file->delete();
+//    }
+}
+
+
+/**
  * Download container blobs.
  *
  * @param stdClass $webgl
@@ -383,6 +439,8 @@ function webgl_delete_container_blobs(stdClass $webgl) {
  */
 function webgl_index_file_url($webgl, $blobdatadetails) {
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
+        $webgl->index_file_url = $blobdatadetails['index'];
+    }elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK){
         $webgl->index_file_url = $blobdatadetails['index'];
     } else {
         $webgl->index_file_url = $blobdatadetails[$blobdatadetails[BS_WEBGL_INDEX]];

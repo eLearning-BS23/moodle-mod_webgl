@@ -65,7 +65,7 @@ $string['secret_key'] = 'AWS secret_key';
 $string['secret_key_help'] = 'AWS secret_key';
 
 $string['storage_engine'] = 'Storage Engine';
-$string['storage_engine_help'] = 'Storage Engine: Webgl provide 2 kind of storage. Azure BLOB storage, AWS S3. Pick suitable one';
+$string['storage_engine_help'] = 'Storage Engine: Webgl provide 3 kind of storage. Moodle default file system, Azure BLOB storage, AWS S3. Pick suitable one';
 
 $string['account_name_error'] = 'Account name should not be empty while storage engine is Azure BLOB storage.';
 $string['account_key_error'] = 'Account key should not be empty while storage engine is Azure BLOB storage.';
@@ -77,6 +77,12 @@ $string['endpoint_error'] = 'Endpoint should not be empty while storage engine i
 
 $string['endpoint'] = 'S3 endpoint';
 $string['endpoint_help'] = 'AWS s3 endpoint';
+
+$string['bucket_name'] = 'AWS S3 Bucket Name';
+$string['bucket_name_help'] = 'AWS s3 bucket name must be unique';
+
+$string['cloudfront_url'] = 'Cloud Front URL';
+$string['cloudfront_url_help'] = 'Cloud Front URL';
 
 $string['store_zip_file'] = 'Upload zip file';
 $string['store_zip_file_help'] = 'Also upload Uploaded zip file to Azure Blob storage.';
@@ -92,7 +98,7 @@ $string['before_description'] = 'Show WebGL content before ' . $moduleintro . ' 
 $string['before_description_help'] = 'By default WebGL content will show after ' . $moduleintro . ' section. Check the checkbox If you want to show content before ' . $moduleintro . ' section ';
 
 $string['storage'] = 'Storage details';
-$string['storage'] = 'Storage details';
+$string['local_file_system'] = 'Moodle file system';
 
 $string['privacy:metadata'] = 'The mod_webgl plugin does not store any personal data.';
 

@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 global $CFG;
-require_once($CFG->dirroot . '/mod/webgl/vendor/autoload.php');
+require_once($CFG->dirroot . '/mod/webgl/thirdparty/vendor/autoload.php');
 
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
 use MicrosoftAzure\Storage\Blob\Models\ListBlobsOptions;

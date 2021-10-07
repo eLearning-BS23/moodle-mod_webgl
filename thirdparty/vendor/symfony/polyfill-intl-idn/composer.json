@@ -21,12 +21,14 @@
     ],
     "require": {
         "php": ">=7.1",
-        "symfony/polyfill-intl-normalizer": "^1.10",
-        "symfony/polyfill-php72": "^1.10"
+        "../../../../../../vendor/symfony/polyfill-intl-normalizer": "^1.10",
+        "../../../../../../vendor/symfony/polyfill-php72": "^1.10"
     },
     "autoload": {
         "psr-4": { "Symfony\\Polyfill\\Intl\\Idn\\": "" },
-        "files": [ "bootstrap.php" ]
+        "files": [
+          "bootstrap.php"
+        ]
     },
     "suggest": {
         "ext-intl": "For best performance"

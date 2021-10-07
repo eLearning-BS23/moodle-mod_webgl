@@ -77,6 +77,7 @@ function webgl_supports(string $feature): ?bool {
 function webgl_add_instance(stdClass $webgl, mod_webgl_mod_form $mform = null): int {
     global $DB;
     $elname = 'importfile';
+
     $webgl->webgl_file = $mform->get_new_filename('importfile');
     $webgl->timecreated = time();
     $webgl->id = $DB->insert_record('webgl', $webgl);
@@ -113,6 +114,7 @@ function webgl_update_instance(stdClass $webgl, mod_webgl_mod_form $mform = null
     // You may have to add extra stuff in here.
     $webgl->timemodified = time();
     $webgl->id = $webgl->instance;
+    webgl_delete_from_s3($webgl);
     $basefilename = $mform->get_new_filename($elname);
     if ($basefilename) {
         $res = $mform->save_temp_file('importfile');
@@ -176,16 +178,19 @@ function webgl_delete_instance($id): bool {
     if (!$webgl = $DB->get_record('webgl', array('id' => $id))) {
         return false;
     }
-
-    // Delete any dependent records here.
-
+    $course = $DB->get_record('course', array('id' => $webgl->course), '*', MUST_EXIST);
+    $cm = get_coursemodule_from_instance('webgl', $webgl->id, $course->id, false, MUST_EXIST);
+    $webgl->coursemodule = $cm->id;
     $DB->delete_records('webgl', array('id' => $webgl->id));
+
     if ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_S3) {
-        webgl_delete_s3_bucket($webgl);
+        // webgl_delete_s3_bucket($webgl);
+        webgl_delete_from_s3($webgl);
+    } elseif ($webgl->storage_engine == mod_webgl_mod_form::STORAGE_ENGINE_LOCAL_DISK) {
+        webgl_delete_from_file_system($webgl);
     } else {
         webgl_delete_container_blobs($webgl);
     }
-
     return true;
 }
 
@@ -456,6 +461,7 @@ function webgl_get_file_info($browser, $areas, $course, $cm, $context, $filearea
  *
  * @package mod_webgl
  */
+
 function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options = array()) {
     global $DB, $CFG;
 
@@ -465,7 +471,15 @@ function webgl_pluginfile($course, $cm, $context, $filearea, array $args, $force
 
     require_login($course, true, $cm);
 
-    send_file_not_found();
+    $relativepath = implode('/', $args);
+    $fullpath = '/' . $context->id . '/mod_webgl/content/' . $relativepath;
+
+    $fs = get_file_storage();
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, $forcedownload);
 }
 
 /* Navigation API */

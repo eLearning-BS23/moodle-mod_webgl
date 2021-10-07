@@ -229,7 +229,7 @@ final class Idn
     private static function isValidContextJ(array $codePoints, $label)
     {
         if (!isset(self::$virama)) {
-            self::$virama = require __DIR__.\DIRECTORY_SEPARATOR.'Resources'.\DIRECTORY_SEPARATOR.'unidata'.\DIRECTORY_SEPARATOR.'virama.php';
+            self::$virama = require __DIR__ . \DIRECTORY_SEPARATOR . 'Resources' . \DIRECTORY_SEPARATOR . 'unidata' . \DIRECTORY_SEPARATOR . 'virama.php';
         }
 
         $offset = 0;
@@ -880,12 +880,12 @@ final class Idn
     {
         if (!self::$mappingTableLoaded) {
             self::$mappingTableLoaded = true;
-            self::$mapped = require __DIR__.'/Resources/unidata/mapped.php';
-            self::$ignored = require __DIR__.'/Resources/unidata/ignored.php';
-            self::$deviation = require __DIR__.'/Resources/unidata/deviation.php';
-            self::$disallowed = require __DIR__.'/Resources/unidata/disallowed.php';
-            self::$disallowed_STD3_mapped = require __DIR__.'/Resources/unidata/disallowed_STD3_mapped.php';
-            self::$disallowed_STD3_valid = require __DIR__.'/Resources/unidata/disallowed_STD3_valid.php';
+            self::$mapped = require __DIR__ . '/Resources/unidata/mapped.php';
+            self::$ignored = require __DIR__ . '/Resources/unidata/ignored.php';
+            self::$deviation = require __DIR__ . '/Resources/unidata/deviation.php';
+            self::$disallowed = require __DIR__ . '/Resources/unidata/disallowed.php';
+            self::$disallowed_STD3_mapped = require __DIR__ . '/Resources/unidata/disallowed_STD3_mapped.php';
+            self::$disallowed_STD3_valid = require __DIR__ . '/Resources/unidata/disallowed_STD3_valid.php';
         }
 
         if (isset(self::$mapped[$codePoint])) {
